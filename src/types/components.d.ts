@@ -9,3 +9,9 @@ type SceneBackgroundProps = {
   intensity?: number;
   className?: string;
 };
+
+interface DashboardHeaderProps {
+  userInitials: string
+  onNewJob: () => void
+  onLogout: () => void
+}
