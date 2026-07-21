@@ -1,0 +1,14 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/app/generated/prisma"
+
+}
+
+datasource db {
+  provider = "cockroachdb"
+}
+
+enum crdb_internal_region {
+  aws_us_east_1 @map("aws-us-east-1")
+}
