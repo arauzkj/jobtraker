@@ -13,6 +13,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
+import { LoginProps } from "@/types/components";
 
 export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {

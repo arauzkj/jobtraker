@@ -1,4 +1,8 @@
-import { BriefcaseBusiness } from "lucide-react";
+import { BriefcaseBusiness, LogOut, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DashboardHeaderProps } from "@/types/components";
 
 export function DashboardHeader({
   userInitials,
@@ -13,11 +17,43 @@ export function DashboardHeader({
             <BriefcaseBusiness className="size-4.5" />
           </span>
           <span className="font-mono text-sm font-medium tracking-widest uppercase">
-            Trayecto
+            Job traker
           </span>
         </div>
+        {/* Botones*/}
+        <div className="flex items-center gap-2">
+          <Button
+            className="hidden font-mono text-xs tracking-wide uppercase sm:inline-flex"
+            onClick={onNewJob}
+          >
+            <Plus data-icon="inline-start" />
+            Nueva postulacion
+          </Button>
+          <Button
+            size="icon"
+            className="sm:hidden"
+            aria-label="Nueva postulación"
+            onClick={onNewJob}
+          >
+            <Plus />
+          </Button>
+          <Separator orientation="vertical" className="mx-1 h-6" />
+
+          <Avatar className="size-8">
+            <AvatarFallback className="bg-secondary text-xs font-medium">
+              {userInitials}
+            </AvatarFallback>
+          </Avatar>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Cerrar sesión"
+            onClick={onLogout}
+          >
+            <LogOut />
+          </Button>
+        </div>
       </div>
-        
     </header>
   );
 }

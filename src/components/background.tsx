@@ -3,6 +3,7 @@
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import type * as THREE from "three";
+import { SceneBackgroundProps } from "@/types/components";
 
 function ParticleField({
   count = 900,
