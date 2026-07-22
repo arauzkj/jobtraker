@@ -1,8 +1,8 @@
 model Account {
-  id                    String    @id
+  id                    BigInt    @id @default(autoincrement())
   accountId             String
   providerId            String
-  userId                String
+  userId                BigInt
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
