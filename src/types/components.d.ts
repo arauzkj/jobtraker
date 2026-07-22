@@ -15,3 +15,75 @@ interface DashboardHeaderProps {
   onNewJob: () => void
   onLogout: () => void
 }
+
+interface StatCardsProps {
+  counts: Record<string, number>
+  activeFilter: string
+  onFilterChange: (filter: string) => void
+}
+
+
+interface DistributionBarProps {
+  counts: Record<string, number>
+  total: number
+}
+
+export type JobStatus =
+  | "pending"
+  | "no_response"
+  | "interview"
+  | "offer"
+  | "rejected"
+  | "withdrawn"
+
+export type InterviewStage =
+  | "screening"
+  | "technical"
+  | "team"
+  | "final"
+
+export type TimelineEntry = {
+  date: string
+  label: string
+  note?: string
+}
+
+export type Job = {
+  id: string
+  company: string
+  role: string
+  location: string
+  workMode: "Remoto" | "Híbrido" | "Presencial"
+  salary: string
+  source: string
+  appliedDate: string
+  lastUpdate: string
+  status: JobStatus
+  stage?: InterviewStage
+  contact: string
+  contactEmail: string
+  url: string
+  notes: string
+  timeline: TimelineEntry[]
+}
+
+interface FilterBarProps {
+  filter: FilterValue
+  query: string
+  onFilterChange: (filter: FilterValue) => void
+  onQueryChange: (query: string) => void
+}
+
+
+interface JobTableProps {
+  jobs: Job[]
+  onSelectJob: (job: Job) => void
+}
+
+interface JobRowProps {
+  job: Job
+  onClick: () => void
+}
+
+
+
