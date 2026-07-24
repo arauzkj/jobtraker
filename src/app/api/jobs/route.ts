@@ -1,14 +1,12 @@
 import { JobService } from "@/services/job.service";
-import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const result = await JobService.getAllJobs();
+    const jobs = await JobService.getAllJobs();
 
-    return NextResponse.json(result, { status: 200 });
+    return Response.json({data:jobs}, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected error";
-
-    return NextResponse.json({ error: message }, { status: 500 });
+    return Response.json({ error: message }, { status: 500 });
   }
 }

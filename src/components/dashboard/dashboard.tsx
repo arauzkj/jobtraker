@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Job } from "@/types/components";
 import {
@@ -102,7 +102,7 @@ export const JOBS: Job[] = [
 
 export function Dashboard() {
   const router = useRouter();
-
+  const [jobs, setJobs] = useState<Job[]>(JOBS); // Estado para almacenar las ofertas de trabajo
   // Estado centralizado aquí
   const [filter, setFilter] = useState<FilterValue>("all");
   const [query, setQuery] = useState("");

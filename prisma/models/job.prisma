@@ -1,14 +1,57 @@
 model Job {
-    id            BigInt   @id @default(autoincrement())
-    title         String
-    description   String
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    id            BigInt          @id @default(autoincrement())
+    title         String?
+    description   String?
+    status        JobStatus       @default(APPLIED)
+    lastStatus    JobStatus?      @default(PENDENTING)
+    stage         JobStage?       @default(APPLIED)
+    role          String?
+    location      String?
+    workMode      String?
+    contact       String?
+    notes         String?
+    salary        String?
+    contactEmail  String?
+    appliedAt     DateTime?
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
     link          String
-    company       String
-    wheresApplied String
+    company       String?
+    wheresApplied String?
     applierId     BigInt
-    applier       User     @relation(fields: [applierId], references: [id], onDelete: Cascade)
+    applier       User            @relation(fields: [applierId], references: [id], onDelete: Cascade)
+    timeline      Timeline_Entry[]
 
     @@map("job")
+}
+
+enum JobStatus {
+    UNANSWERED
+    APPLIED
+    PENDENTING
+    INTERVIEW
+    TECHNICAL_TEST
+    OFFER
+    REJECTED
+    WITHDRAWN
+}
+
+enum JobStage {
+    APPLIED
+    PHONE_SCREEN
+    TECHNICAL_INTERVIEW
+    FINAL_INTERVIEW
+    OFFER
+    REJECTED
+    WITHDRAWN
+}
+
+model Timeline_Entry {
+    id    BigInt   @id @default(autoincrement())
+    jobId BigInt
+    job   Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    date  DateTime @default(now())
+    label String
+    notes String?
+    @@map("timeline_entry")
 }
