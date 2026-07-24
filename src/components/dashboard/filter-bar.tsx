@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { FilterBarProps } from "@/types/components";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
 import { Search } from "lucide-react";
 import { FILTERS } from "./dashboard";

@@ -1,7 +1,6 @@
 import { CircleSlash } from "lucide-react";
 import { Card } from "../ui/card";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "../ui/table";
-import { JobTableProps } from "@/types/components";
 import { JobRow } from "./job-row";
 
 export function JobTable({ jobs, onSelectJob }: JobTableProps) {

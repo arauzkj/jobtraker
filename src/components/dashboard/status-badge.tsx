@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils"
-import { JobStatus } from "@/types/components"
 import { STATUS_META } from "./distribution-bar"
+import { JobStatusDto } from "@/dto/jobstatus.dto.enum"
 
 export function StatusBadge({
   status,
   className,
 }: {
-  status: JobStatus
+  status: JobStatusDto
   className?: string
 }) {
   const meta = STATUS_META[status]

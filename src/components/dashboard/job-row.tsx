@@ -1,15 +1,19 @@
-import { InterviewStage, JobRowProps } from "@/types/components";
+import { JobStageDto } from "@/dto/jobstage.dto.enum";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { TableCell, TableRow } from "../ui/table";
 import { StatusBadge } from "./status-badge";
 
-
-export const STAGE_META: Record<InterviewStage, { label: string; step: number }> = {
-  screening: { label: "Screening RRHH", step: 1 },
-  technical: { label: "Entrevista técnica", step: 2 },
-  team: { label: "Entrevista con el equipo", step: 3 },
-  final: { label: "Entrevista final / Manager", step: 4 },
-}
+export const STAGE_META: Record<JobStageDto, { label: string; step: number }> =
+  {
+    APPLIED: { label: "Aplicado", step: 0 },
+    PHONE_SCREEN: { label: "Screening RRHH", step: 1 },
+    TECHNICAL_INTERVIEW: { label: "Entrevista técnica", step: 2 },
+    TEAM_INTERVIEW: { label: "Entrevista con el equipo", step: 3 },
+    FINAL_INTERVIEW: { label: "Entrevista final / Manager", step: 4 },
+    OFFER: { label: "Oferta", step: 5 },
+    REJECTED: { label: "Rechazado", step: 6 },
+    WITHDRAWN: { label: "Retirado", step: 7 },
+  };
 
 export function getInitials(name: string): string {
   return name
@@ -17,17 +21,17 @@ export function getInitials(name: string): string {
     .slice(0, 2)
     .map((w) => w[0])
     .join("")
-    .toUpperCase()
+    .toUpperCase();
 }
 
 export function formatDate(iso: string): string {
-  if (!iso || iso === "—") return "—"
-  const d = new Date(iso + "T00:00:00")
+  if (!iso || iso === "—") return "—";
+  const d = new Date(iso + "T00:00:00");
   return d.toLocaleDateString("es-MX", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  })
+  });
 }
 
 export function JobRow({ job, onClick }: JobRowProps) {
@@ -62,7 +66,7 @@ export function JobRow({ job, onClick }: JobRowProps) {
       <TableCell className="hidden md:table-cell">
         {job.stage ? (
           <span className="text-sm text-muted-foreground">
-            {STAGE_META[job.stage].label}
+            {STAGE_META[job.stage as JobStageDto].label}
           </span>
         ) : (
           <span className="text-sm text-muted-foreground/50">—</span>
@@ -73,5 +77,5 @@ export function JobRow({ job, onClick }: JobRowProps) {
         {formatDate(job.lastUpdate)}
       </TableCell>
     </TableRow>
-  )
+  );
 }

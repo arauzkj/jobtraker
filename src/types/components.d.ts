@@ -28,45 +28,6 @@ interface DistributionBarProps {
   total: number
 }
 
-export type JobStatus =
-  | "pending"
-  | "no_response"
-  | "interview"
-  | "offer"
-  | "rejected"
-  | "withdrawn"
-
-export type InterviewStage =
-  | "screening"
-  | "technical"
-  | "team"
-  | "final"
-
-export type TimelineEntry = {
-  date: string
-  label: string
-  note?: string
-}
-
-export type Job = {
-  id: string
-  company: string
-  role: string
-  location: string
-  workMode: "Remoto" | "Híbrido" | "Presencial"
-  salary: string
-  source: string
-  appliedDate: string
-  lastUpdate: string
-  status: JobStatus
-  stage?: InterviewStage
-  contact: string
-  contactEmail: string
-  url: string
-  notes: string
-  timeline: TimelineEntry[]
-}
-
 interface FilterBarProps {
   filter: FilterValue
   query: string

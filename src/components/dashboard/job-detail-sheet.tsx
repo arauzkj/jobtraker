@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils"
-import { InterviewStage, Job } from "@/types/components"
 import { Building2, CalendarDays, Check, ExternalLink, Mail, MapPin, Pencil, Trash2, Wallet } from "lucide-react"
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../ui/sheet"
 import { StatusBadge } from "./status-badge"
@@ -7,15 +6,12 @@ import { ScrollArea } from "../ui/scroll-area"
 import { formatDate, STAGE_META } from "./job-row"
 import { Separator } from "../ui/separator"
 import { Button } from "../ui/button"
+import { JobDto } from "@/dto/job.dto"
+import { JobStageDto } from "@/dto/jobstage.dto.enum"
 
-export const STAGE_ORDER: InterviewStage[] = [
-  "screening",
-  "technical",
-  "team",
-  "final",
-]
+export const STAGE_ORDER: JobStageDto[] = []
 
-function StageProgress({ job }: { job: Job }) {
+function StageProgress({ job }: { job: JobDto }) {
   const currentStep = job.stage ? STAGE_META[job.stage].step : 0
   return (
     <div className="flex flex-col gap-3">
@@ -96,7 +92,7 @@ export function JobDetailSheet({
   open,
   onOpenChange,
 }: {
-  job: Job | null
+  job: JobDto | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
@@ -128,20 +124,20 @@ export function JobDetailSheet({
                   <Fact icon={MapPin} label="Ubicación" value={job.location} />
                   <Fact icon={Building2} label="Modalidad" value={job.workMode} />
                   <Fact icon={Wallet} label="Salario" value={job.salary} />
-                  <Fact icon={CalendarDays} label="Fuente" value={job.source} />
+                  <Fact icon={CalendarDays} label="Fuente" value={job.wheresApplied} />
                   <Fact
                     icon={CalendarDays}
                     label="Postulado"
-                    value={formatDate(job.appliedDate)}
+                    value={formatDate(job.appliedAt?.toString() ?? "")}
                   />
                   <Fact
                     icon={CalendarDays}
                     label="Actualizado"
-                    value={formatDate(job.lastUpdate)}
+                    value={formatDate(job.updatedAt?.toString() ?? "")}
                   />
                 </div>
 
-                {job.status === "interview" && (
+                {job.status.toString() === "interview" && (
                   <>
                     <Separator />
                     <StageProgress job={job} />
@@ -185,8 +181,8 @@ export function JobDetailSheet({
                     Historial
                   </span>
                   <ol className="flex flex-col gap-0">
-                    {job.timeline.map((entry, i) => {
-                      const isLast = i === job.timeline.length - 1
+                    {job.timeline?.map((entry, i) => {
+                      const isLast = i === (job.timeline?.length ?? 0) - 1
                       return (
                         <li key={i} className="flex gap-3">
                           <div className="flex flex-col items-center">
@@ -196,11 +192,11 @@ export function JobDetailSheet({
                           <div className={cn("pb-4", isLast && "pb-0")}>
                             <p className="text-sm font-medium">{entry.label}</p>
                             <p className="font-mono text-[11px] tracking-wide text-muted-foreground">
-                              {formatDate(entry.date)}
+                              {formatDate(entry.date?.toString() ?? "")}
                             </p>
-                            {entry.note && (
+                            {entry.notes && (
                               <p className="mt-0.5 text-xs text-muted-foreground">
-                                {entry.note}
+                                {entry.notes}
                               </p>
                             )}
                           </div>
@@ -220,7 +216,7 @@ export function JobDetailSheet({
               <Button
                 variant="outline"
                 nativeButton={false}
-                render={<a href={job.url} target="_blank" rel="noreferrer" />}
+                render={<a href={job.link} target="_blank" rel="noreferrer" />}
               >
                 <ExternalLink data-icon="inline-start" />
                 Oferta

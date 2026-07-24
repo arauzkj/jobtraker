@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { STAT_CARDS } from "./dashboard";
-import { StatCardsProps } from "@/types/components";
 
 export function StatCards({
   counts,
