@@ -1,8 +1,12 @@
-import { Job, JobStage, JobStatus, Timeline_Entry,  } from "@/app/generated/prisma/client";
+import {
+  Job,
+  JobStage,
+  JobStatus,
+  Timeline_Entry,
+} from "@/app/generated/prisma/client";
 import { Timeline_EntryDto } from "./timeline_entry.dto";
 import { JobStatusDto } from "./jobstatus.dto.enum";
 import { JobStageDto } from "./jobstage.dto.enum";
-
 
 export class JobDto {
   id?: bigint;
@@ -31,9 +35,9 @@ export class JobDto {
     this.id = data.id;
     this.title = data.title || "";
     this.description = data.description || "";
-    this.status = data.status as JobStatusDto || "APPLIED";
-    this.lastStatus = data.lastStatus as JobStatusDto ?? "PENDENTING";
-    this.stage = data.stage as JobStageDto ?? "APPLIED";
+    this.status = (data.status as JobStatusDto) || "APPLIED";
+    this.lastStatus = (data.lastStatus as JobStatusDto) ?? "PENDENTING";
+    this.stage = (data.stage as JobStageDto) ?? "APPLIED";
     this.role = data.role || "";
     this.location = data.location || "";
     this.workMode = data.workMode || "";
