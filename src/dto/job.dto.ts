@@ -1,14 +1,16 @@
 import { Job, JobStage, JobStatus, Timeline_Entry,  } from "@/app/generated/prisma/client";
 import { Timeline_EntryDto } from "./timeline_entry.dto";
+import { JobStatusDto } from "./jobstatus.dto.enum";
+import { JobStageDto } from "./jobstage.dto.enum";
 
 
 export class JobDto {
   id?: bigint;
   title: string;
   description: string;
-  status: JobStatus;
-  lastStatus?: JobStatus | null;
-  stage?: JobStage | null;
+  status: JobStatusDto;
+  lastStatus?: JobStatusDto | null;
+  stage?: JobStageDto | null;
   role: string;
   location: string;
   workMode: string;
@@ -29,9 +31,9 @@ export class JobDto {
     this.id = data.id;
     this.title = data.title || "";
     this.description = data.description || "";
-    this.status = data.status || "APPLIED";
-    this.lastStatus = data.lastStatus ?? "PENDENTING";
-    this.stage = data.stage ?? "APPLIED";
+    this.status = data.status as JobStatusDto || "APPLIED";
+    this.lastStatus = data.lastStatus as JobStatusDto ?? "PENDENTING";
+    this.stage = data.stage as JobStageDto ?? "APPLIED";
     this.role = data.role || "";
     this.location = data.location || "";
     this.workMode = data.workMode || "";
@@ -79,9 +81,9 @@ export class JobDto {
     return {
       title: this.title,
       description: this.description,
-      status: this.status,
-      lastStatus: this.lastStatus,
-      stage: this.stage,
+      status: this.status as JobStatus,
+      lastStatus: this.lastStatus as JobStatus,
+      stage: this.stage as JobStage,
       role: this.role,
       location: this.location,
       workMode: this.workMode,
@@ -104,9 +106,9 @@ export class JobDto {
       id: job.id,
       title: job.title ?? "",
       description: job.description ?? "",
-      status: job.status,
-      lastStatus: job.lastStatus,
-      stage: job.stage,
+      status: job.status as JobStatusDto,
+      lastStatus: job.lastStatus as JobStatusDto,
+      stage: job.stage as JobStageDto,
       role: job.role ?? "",
       location: job.location ?? "",
       workMode: job.workMode ?? "",
