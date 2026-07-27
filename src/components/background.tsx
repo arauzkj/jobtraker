@@ -63,7 +63,7 @@ function FloatingKnot({ intensity }: { intensity: number }) {
   return (
     <mesh
       ref={meshRef}
-      position={[3.2, 0, -2]}
+      position={[1.5, 0, 2]}
       scale={1.6 * (0.6 + intensity * 0.6)}
     >
       <torusKnotGeometry args={[1, 0.28, 160, 24]} />
