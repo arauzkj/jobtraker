@@ -10,12 +10,13 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { DistributionBar, STATUS_META } from "./distribution-bar";
+import { DistributionBar } from "./distribution-bar";
 import { StatCards } from "./stat-cards";
 import { FilterBar } from "./filter-bar";
 import { JobTable } from "./job-table";
 import { JobDetailSheet } from "./job-detail-sheet";
 import { JobDto } from "@/dto/job.dto";
+import { STATUS_META } from "@/dto/status.const";
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
-import { STATUS_META } from "./distribution-bar"
 import { JobStatusDto } from "@/dto/jobstatus.dto.enum"
+import { STATUS_META } from "@/dto/status.const"
 
 export function StatusBadge({
   status,

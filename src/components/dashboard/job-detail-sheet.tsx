@@ -3,13 +3,14 @@ import { Building2, CalendarDays, Check, ExternalLink, Mail, MapPin, Pencil, Tra
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../ui/sheet"
 import { StatusBadge } from "./status-badge"
 import { ScrollArea } from "../ui/scroll-area"
-import { formatDate, STAGE_META } from "./job-row"
+import { formatDate } from "./job-row"
 import { Separator } from "../ui/separator"
 import { Button } from "../ui/button"
 import { JobDto } from "@/dto/job.dto"
-import { JobStageDto } from "@/dto/jobstage.dto.enum"
+import { STAGE_ORDER } from "@/dto/stage_order.const"
+import { STAGE_META } from "@/dto/stage_meta.const"
 
-export const STAGE_ORDER: JobStageDto[] = []
+
 
 function StageProgress({ job }: { job: JobDto }) {
   const currentStep = job.stage ? STAGE_META[job.stage].step : 0

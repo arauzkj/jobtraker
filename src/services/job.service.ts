@@ -7,7 +7,7 @@ export class JobService {
     try {
       const jobs: Job[] = await JobRepository.findAll();
       if (!jobs || jobs.length === 0) {
-        throw new Error("No se encontró la oferta de trabajo");
+        return [];
       }
       const jobsDto: JobDto[] = jobs.map((job) => JobDto.fromPrisma(job));
       
