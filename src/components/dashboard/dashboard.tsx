@@ -17,6 +17,7 @@ import { JobTable } from "./job-table";
 import { JobDetailSheet } from "./job-detail-sheet";
 import { JobDto } from "@/dto/job.dto";
 import { STATUS_META } from "@/dto/status.const";
+import { NewJobSheet } from "./new_job";
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
@@ -49,6 +50,7 @@ export function Dashboard() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<JobDto | null>(null);
   const [open, setOpen] = useState(false);
+  const [newOpen, setNewOpen] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -114,9 +116,7 @@ export function Dashboard() {
     setOpen(true);
   };
 
-  const handleNewJob = () => {
-    // router.push("/jobs/new") o abrir un modal
-  };
+  function handleCreate() {}
 
   const handleLogout = () => {
     router.push("/");
@@ -126,7 +126,7 @@ export function Dashboard() {
     <div className="min-h-svh">
       <DashboardHeader
         userInitials="JC"
-        onNewJob={handleNewJob}
+        onOpenChange={setNewOpen}
         onLogout={handleLogout}
       />
 
@@ -181,6 +181,11 @@ export function Dashboard() {
       </main>
 
       <JobDetailSheet job={selected} open={open} onOpenChange={setOpen} />
+      <NewJobSheet
+        open={newOpen}
+        onOpenChange={setNewOpen}
+        onCreate={handleCreate}
+      />
     </div>
   );
 }

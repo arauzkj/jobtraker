@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function DashboardHeader({
   userInitials,
-  onNewJob,
+  onOpenChange,
   onLogout,
 }: DashboardHeaderProps) {
   return (
@@ -23,16 +23,16 @@ export function DashboardHeader({
         <div className="flex items-center gap-2">
           <Button
             className="hidden font-mono text-xs tracking-wide uppercase sm:inline-flex"
-            onClick={onNewJob}
+            onClick={() => onOpenChange(true)}
           >
             <Plus data-icon="inline-start" />
-            Nueva postulacion
+            Nueva postulación
           </Button>
           <Button
             size="icon"
             className="sm:hidden"
             aria-label="Nueva postulación"
-            onClick={onNewJob}
+            onClick={() => onOpenChange(true)}
           >
             <Plus />
           </Button>

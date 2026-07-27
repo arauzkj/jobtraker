@@ -12,7 +12,7 @@ type SceneBackgroundProps = {
 
 interface DashboardHeaderProps {
   userInitials: string;
-  onNewJob: () => void;
+  onOpenChange: (open: boolean) => void
   onLogout: () => void;
 }
 
@@ -76,4 +76,10 @@ interface RegisterProps{
   showPassword: boolean;
   setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
   onSubmit: (data: FormData) => void;
+}
+
+interface NewJobProps{
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onCreate: (job: JobDto) => void
 }
