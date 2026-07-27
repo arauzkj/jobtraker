@@ -9,6 +9,7 @@ import { Button } from "../ui/button"
 import { JobDto } from "@/dto/job.dto"
 import { STAGE_ORDER } from "@/dto/stage_order.const"
 import { STAGE_META } from "@/dto/stage_meta.const"
+import { Timeline_EntryDto } from "@/dto/timeline_entry.dto"
 
 
 
@@ -92,11 +93,9 @@ export function JobDetailSheet({
   job,
   open,
   onOpenChange,
-}: {
-  job: JobDto | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}) {
+  onEdit,
+  onDelete
+}: JobDetailSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full gap-0 sm:max-w-lg">
@@ -119,26 +118,26 @@ export function JobDetailSheet({
               <StatusBadge status={job.status} />
             </SheetHeader>
 
-            <ScrollArea className="flex-1">
+            <ScrollArea className="flex-1 min-h-0">
               <div className="flex flex-col gap-6 p-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Fact icon={MapPin} label="Ubicación" value={job.location} />
                   <Fact icon={Building2} label="Modalidad" value={job.workMode} />
                   <Fact icon={Wallet} label="Salario" value={job.salary} />
-                  <Fact icon={CalendarDays} label="Fuente" value={job.wheresApplied} />
+                  <Fact icon={CalendarDays} label="Fuente" value={job.source} />
                   <Fact
                     icon={CalendarDays}
                     label="Postulado"
-                    value={formatDate(job.appliedAt?.toString() ?? "")}
+                    value={formatDate(job.appliedDate)}
                   />
                   <Fact
                     icon={CalendarDays}
                     label="Actualizado"
-                    value={formatDate(job.updatedAt?.toString() ?? "")}
+                    value={formatDate(job.lastUpdate)}
                   />
                 </div>
 
-                {job.status.toString() === "interview" && (
+                {job.status === "interview" && (
                   <>
                     <Separator />
                     <StageProgress job={job} />
@@ -182,8 +181,8 @@ export function JobDetailSheet({
                     Historial
                   </span>
                   <ol className="flex flex-col gap-0">
-                    {job.timeline?.map((entry, i) => {
-                      const isLast = i === (job.timeline?.length ?? 0) - 1
+                    {job.timeline.map((entry: Timeline_EntryDto, i: number) => {
+                      const isLast = i === job.timeline.length - 1
                       return (
                         <li key={i} className="flex gap-3">
                           <div className="flex flex-col items-center">
@@ -193,7 +192,7 @@ export function JobDetailSheet({
                           <div className={cn("pb-4", isLast && "pb-0")}>
                             <p className="text-sm font-medium">{entry.label}</p>
                             <p className="font-mono text-[11px] tracking-wide text-muted-foreground">
-                              {formatDate(entry.date?.toString() ?? "")}
+                              {formatDate(entry.date?.toISOString() || "")}
                             </p>
                             {entry.notes && (
                               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -210,14 +209,18 @@ export function JobDetailSheet({
             </ScrollArea>
 
             <SheetFooter className="flex-row gap-2 border-t p-4">
-              <Button variant="outline" className="flex-1">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => onEdit?.(job)}
+              >
                 <Pencil data-icon="inline-start" />
                 Editar
               </Button>
               <Button
                 variant="outline"
                 nativeButton={false}
-                render={<a href={job.link} target="_blank" rel="noreferrer" />}
+                render={<a href={job.url} target="_blank" rel="noreferrer" />}
               >
                 <ExternalLink data-icon="inline-start" />
                 Oferta
@@ -227,6 +230,7 @@ export function JobDetailSheet({
                 size="icon"
                 className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 aria-label="Eliminar"
+                onClick={() => onDelete?.(job)}
               >
                 <Trash2 />
               </Button>

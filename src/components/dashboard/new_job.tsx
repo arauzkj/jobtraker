@@ -1,4 +1,4 @@
-import { Briefcase, Building2 } from "lucide-react";
+import { Briefcase, Building2, Pencil, Save } from "lucide-react";
 import { Button } from "../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { ScrollArea } from "../ui/scroll-area";
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
 import { STATUS_META } from "@/dto/status.const";
 import { JobDto } from "@/dto/job.dto";
@@ -37,17 +37,33 @@ const emptyForm = {
   notes: "",
 };
 
-export function NewJobSheet({ open, onOpenChange, onCreate }: NewJobProps) {
+export function NewJobSheet({
+  open,
+  onOpenChange,
+  onCreate,
+  onUpdate,
+  job = null,
+}: NewJobProps) {
   const WORK_MODES = ["Remoto", "Híbrido", "Presencial"];
   const [form, setForm] = useState(emptyForm);
+  const isEditing = Boolean(job);
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  useEffect(()=>{
+    if(!open) return
+    if(job){
+      return
+    }else{
+      return
+    }
+  }, [job,open]);
+
   function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
-    
+
     onOpenChange(false);
   }
 
@@ -57,20 +73,26 @@ export function NewJobSheet({ open, onOpenChange, onCreate }: NewJobProps) {
         <SheetHeader className="gap-3 border-b p-6">
           <div className="flex items-start gap-3">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Briefcase className="size-5" />
+              {isEditing ? <Pencil className="size-5" /> : <Briefcase className="size-5" />}
             </span>
             <div className="flex flex-col gap-1">
               <SheetTitle className="text-lg leading-tight">
-                Nueva postulación
+                {isEditing ? "Editar postulación" : "Nueva postulación"}
               </SheetTitle>
               <SheetDescription className="text-sm">
-                Registra un nuevo trabajo al que te postulaste.
+                {isEditing
+                  ? "Actualiza los datos de esta postulación."
+                  : "Registra un nuevo trabajo al que te postulaste."}
               </SheetDescription>
             </div>
           </div>
         </SheetHeader>
 
-        <form id="new-job-form" onSubmit={handleSubmit} className="contents">
+        <form
+          id="new-job-form"
+          onSubmit={handleSubmit}
+          className="contents"
+        >
           <ScrollArea className="flex-1">
             <FieldGroup className="p-6">
               <Field>
@@ -107,9 +129,7 @@ export function NewJobSheet({ open, onOpenChange, onCreate }: NewJobProps) {
                   <FieldLabel>Modalidad</FieldLabel>
                   <Select
                     value={form.workMode}
-                    onValueChange={(v) =>
-                      set("workMode", v as typeof form.workMode)
-                    }
+                    onValueChange={(v) => set("workMode", v as typeof form.workMode)}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
@@ -150,7 +170,7 @@ export function NewJobSheet({ open, onOpenChange, onCreate }: NewJobProps) {
                 <FieldLabel>Estado</FieldLabel>
                 <Select
                   value={form.status}
-                  onValueChange={(v) => set("status", v as typeof form.status)}
+                  onValueChange={(v) => set("status", v as JobStatusDto)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue>
@@ -178,9 +198,7 @@ export function NewJobSheet({ open, onOpenChange, onCreate }: NewJobProps) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="contactEmail">
-                    Correo de contacto
-                  </FieldLabel>
+                  <FieldLabel htmlFor="contactEmail">Correo de contacto</FieldLabel>
                   <Input
                     id="contactEmail"
                     type="email"
@@ -225,8 +243,12 @@ export function NewJobSheet({ open, onOpenChange, onCreate }: NewJobProps) {
               Cancelar
             </Button>
             <Button type="submit" className="flex-1">
-              <Building2 data-icon="inline-start" />
-              Guardar postulación
+              {isEditing ? (
+                <Save data-icon="inline-start" />
+              ) : (
+                <Building2 data-icon="inline-start" />
+              )}
+              {isEditing ? "Guardar cambios" : "Guardar postulación"}
             </Button>
           </SheetFooter>
         </form>

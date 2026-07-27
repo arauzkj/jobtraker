@@ -52,6 +52,9 @@ export function Dashboard() {
   const [open, setOpen] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
 
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<JobDto | null>(null);
+
   useEffect(() => {
     const controller = new AbortController();
     async function fetchJobs() {
@@ -122,6 +125,27 @@ export function Dashboard() {
     router.push("/");
   };
 
+  function openNew() {
+    setEditing(null);
+    setFormOpen(true);
+  }
+
+  function handleEdit(job: JobDto) {
+    setOpen(false);
+    setEditing(job);
+    setTimeout(() => setFormOpen(true), 250);
+  }
+
+  function handleUpdate(updated: JobDto) {
+    setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
+    setSelected((prev) => (prev && prev.id === updated.id ? updated : prev));
+  }
+
+  function handleDelete(job: JobDto) {
+    setJobs((prev) => prev.filter((j) => j.id !== job.id));
+    setOpen(false);
+  }
+
   return (
     <div className="min-h-svh">
       <DashboardHeader
@@ -180,11 +204,19 @@ export function Dashboard() {
         </p>
       </main>
 
-      <JobDetailSheet job={selected} open={open} onOpenChange={setOpen} />
+      <JobDetailSheet
+        job={selected}
+        open={open}
+        onOpenChange={setOpen}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
       <NewJobSheet
-        open={newOpen}
-        onOpenChange={setNewOpen}
+        open={formOpen}
+        onOpenChange={setFormOpen}
         onCreate={handleCreate}
+        onUpdate={handleUpdate}
+        job={editing}
       />
     </div>
   );

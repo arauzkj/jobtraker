@@ -82,4 +82,14 @@ interface NewJobProps{
   open: boolean
   onOpenChange: (open: boolean) => void
   onCreate: (job: JobDto) => void
+  onUpdate?: (job: JobDto) => void
+  job?: JobDto | null
+}
+
+interface JobDetailSheetProps{
+  job: JobDto | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onEdit?: (job: JobDto) => void
+  onDelete?: (job: JobDto) => void
 }
