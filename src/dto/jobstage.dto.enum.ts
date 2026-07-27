@@ -7,4 +7,5 @@ export enum JobStageDto {
   OFFER = "OFFER",
   REJECTED = "REJECTED",
   WITHDRAWN = "WITHDRAWN",
+  ACCEPTED = "ACCEPTED",
 }

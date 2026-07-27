@@ -34,6 +34,7 @@ enum JobStatus {
     OFFER
     REJECTED
     WITHDRAWN
+    ACCEPTED
 }
 
 enum JobStage {
@@ -45,6 +46,7 @@ enum JobStage {
     OFFER
     REJECTED
     WITHDRAWN
+    ACCEPTED
 }
 
 model Timeline_Entry {
