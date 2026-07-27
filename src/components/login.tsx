@@ -1,18 +1,13 @@
-import {
-  BriefcaseBusiness,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-} from "lucide-react";
+import { BriefcaseBusiness, Mail } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
+import { PasswordField } from "@/components/shared/password-field";
+import Link from "next/link";
 
 export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -90,32 +85,16 @@ export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
               </InputGroup>
             </Field>
 
-            <Field>
-              <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon>
-                  <LockKeyhole />
-                </InputGroupAddon>
-                <InputGroupInput
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  defaultValue="demo1234"
-                  autoComplete="current-password"
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    size="icon-xs"
-                    aria-label={
-                      showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
-                    }
-                    onClick={() => setShowPassword((v) => !v)}
-                  >
-                    {showPassword ? <EyeOff /> : <Eye />}
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-            </Field>
+            <PasswordField
+              id="password"
+              name="password"
+              label="Contraseña"
+              placeholder="••••••••"
+              defaultValue="demo1234"
+              autoComplete="current-password"
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+            />
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -144,14 +123,14 @@ export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          ¿No tienes cuenta?{" "}
-          <button
-            type="button"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
-          >
-            Regístrate
-          </button>
-        </p>
+            ¿No tienes cuenta?{" "}
+            <Link
+              href="/register"
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              Regístrate
+            </Link>
+          </p>
       </section>
     </div>
   );
