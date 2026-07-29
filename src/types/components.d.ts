@@ -77,6 +77,10 @@ interface PasswordFieldProps {
 interface RegisterProps{
   showPassword: boolean;
   setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
+  username: string;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
+  available: boolean | null;
+  loading: boolean;
   onSubmit: (data: FormData) => void;
 }
 

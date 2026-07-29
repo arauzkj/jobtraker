@@ -19,7 +19,6 @@ export const auth = betterAuth({
     minPasswordLength: 1,
     autoSignIn: false,
   },
-  disabledPaths: ["/is-username-available"],
   plugins: [username(), nextCookies()],
   /*
   socialProviders:{

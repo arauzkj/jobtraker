@@ -2,13 +2,19 @@
 
 import { SceneBackground } from "@/components/background";
 import { Register } from "@/components/register/register";
+import { useDebounce } from "@/hooks/use-debounce";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const debouncedUsername = useDebounce(username, 500);
+  const [available, setAvailable] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(false);
+
   async function handleSubmit(dataForm: FormData) {
     const { data, error } = await authClient.signUp.email({
       email: dataForm.get("email") as string,
@@ -18,6 +24,25 @@ export default function RegisterPage() {
       callbackURL: "/dashboard",
     });
   }
+
+  useEffect(() => {
+    async function checkUsernameAvailability() {
+      setLoading(true);
+      try {
+        const result = await authClient.isUsernameAvailable({
+          username: debouncedUsername,
+        });
+        setAvailable(result.data?.available ?? null);
+      } catch (e) {
+        console.error(e);
+        setAvailable(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkUsernameAvailability();
+  }, [debouncedUsername]);
   return (
     <main className="relative flex min-h-svh w-full items-center justify-center overflow-hidden px-4 py-10">
       <SceneBackground
@@ -29,6 +54,10 @@ export default function RegisterPage() {
         showPassword={showPassword}
         setShowPassword={setShowPassword}
         onSubmit={handleSubmit}
+        setUsername={setUsername}
+        username={username}
+        available={available}
+        loading={loading}
       ></Register>
     </main>
   );
