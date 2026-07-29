@@ -8,8 +8,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { PasswordField } from "@/components/shared/password-field";
 import Link from "next/link";
+import { Spinner } from "./ui/spinner";
 
-export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
+export function Login({
+  showPassword,
+  setShowPassword,
+  onSubmit,
+  loading,
+  shake,
+}: LoginProps) {
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -79,7 +86,6 @@ export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
                   id="email"
                   type="email"
                   placeholder="tucorreo@ejemplo.com"
-                  defaultValue="demo@trayecto.app"
                   autoComplete="email"
                 />
               </InputGroup>
@@ -90,7 +96,6 @@ export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
               name="password"
               label="Contraseña"
               placeholder="••••••••"
-              defaultValue="demo1234"
               autoComplete="current-password"
               showPassword={showPassword}
               setShowPassword={setShowPassword}
@@ -115,22 +120,32 @@ export function Login({ showPassword, setShowPassword, onSubmit }: LoginProps) {
 
             <Button
               type="submit"
-              className="mt-1 w-full font-mono tracking-wide uppercase"
+              disabled={loading}
+              className={`mt-1 w-full font-mono tracking-wide uppercase ${
+                shake ? "animate-shake" : ""
+              }`}
             >
-              Entrar al tablero
+              {loading ? (
+                <>
+                  <Spinner className="size-4" />
+                  Entrando...
+                </>
+              ) : (
+                "Entrar"
+              )}
             </Button>
           </FieldGroup>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-            ¿No tienes cuenta?{" "}
-            <Link
-              href="/register"
-              className="font-medium text-foreground underline-offset-4 hover:underline"
-            >
-              Regístrate
-            </Link>
-          </p>
+          ¿No tienes cuenta?{" "}
+          <Link
+            href="/register"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Regístrate
+          </Link>
+        </p>
       </section>
     </div>
   );

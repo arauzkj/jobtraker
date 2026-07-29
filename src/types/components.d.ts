@@ -2,6 +2,8 @@ interface LoginProps {
   showPassword: boolean;
   setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
   onSubmit: (data: FormData) => void;
+  loading: boolean;
+  shake: boolean;
 }
 
 type SceneBackgroundProps = {

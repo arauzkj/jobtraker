@@ -1,17 +1,45 @@
 "use client";
 import { SceneBackground } from "@/components/background";
 import { Login } from "@/components/login";
+import { toast } from "@/components/ui/toast";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
-  const router = useRouter()
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [shake, setShake] = useState(false);
 
-  function handleSubmit(data: FormData) {
-    // Login "tonto": sin lógica todavía, solo entra al dashboard.
-    console.log("Login data:", Object.fromEntries(data.entries()));
-    router.push("/dashboard");
+  async function handleSubmit(dataForm: FormData) {
+    setLoading(true);
+
+    const { data, error } = await authClient.signIn.email({
+      email: dataForm.get("email") as string,
+      password: dataForm.get("password") as string,
+      callbackURL: "/dashboard"
+    });
+
+    if (error) {
+      setLoading(false);
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+
+      toast.add({
+        title: "No se pudo iniciar sesión",
+        description: "Revisa tus credenciales e intenta de nuevo.",
+        type: "error",
+      });
+      return;
+    }
+
+    toast.add({
+      title: "Sesión iniciada",
+      description: "Bienvenido de vuelta a Trayecto.",
+      type: "success",
+    });
+
   }
 
   return (
@@ -22,7 +50,13 @@ export default function Home() {
       />
       <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-background/40 via-background/10 to-background/70" />
 
-      <Login setShowPassword={setShowPassword} showPassword={showPassword} onSubmit={handleSubmit} />
+      <Login
+        setShowPassword={setShowPassword}
+        showPassword={showPassword}
+        onSubmit={handleSubmit}
+        loading={loading}
+        shake={shake}
+      />
     </main>
   );
 }
