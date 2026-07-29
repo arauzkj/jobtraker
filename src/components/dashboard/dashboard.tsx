@@ -50,7 +50,6 @@ export function Dashboard() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<JobDto | null>(null);
   const [open, setOpen] = useState(false);
-  const [newOpen, setNewOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<JobDto | null>(null);
@@ -150,7 +149,7 @@ export function Dashboard() {
     <div className="min-h-svh">
       <DashboardHeader
         userInitials="JC"
-        onOpenChange={setNewOpen}
+        onOpenChange={openNew}
         onLogout={handleLogout}
       />
 

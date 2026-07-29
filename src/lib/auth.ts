@@ -19,13 +19,25 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
     minPasswordLength: 1,
+    autoSignIn: false,   
   },
   plugins: [
     username(),
     nextCookies()
-  ]
+  ],
   /*
   socialProviders:{
 
   }*/
+
+  user: {
+    additionalFields:{
+      username:{
+        type: "string",
+        required: true,
+      }
+    }
+  }
+
+  
 });
