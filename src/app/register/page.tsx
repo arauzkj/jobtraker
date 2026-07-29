@@ -21,7 +21,7 @@ export default function RegisterPage() {
       password: dataForm.get("password") as string,
       name: "",
       username: "",
-      callbackURL: "/dashboard",
+      callbackURL: "/",
     });
   }
 
