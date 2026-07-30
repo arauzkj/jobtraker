@@ -1,4 +1,4 @@
-import { Job } from "@/app/generated/prisma/client";
+import { Job, Prisma } from "@/app/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 export class JobRepository {
@@ -42,7 +42,7 @@ export class JobRepository {
     }
   }
 
-  static async create(jobData: Omit<Job, "id">): Promise<Job> {
+  static async create(jobData: Prisma.JobUncheckedCreateInput): Promise<Job> {
     try {
       const job: Job = await prisma.job.create({
         data: jobData,

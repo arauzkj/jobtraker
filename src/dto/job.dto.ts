@@ -2,6 +2,7 @@ import {
   Job,
   JobStage,
   JobStatus,
+  Prisma,
   Timeline_Entry,
 } from "@/app/generated/prisma/client";
 import { Timeline_EntryDto } from "./timeline_entry.dto";
@@ -81,13 +82,13 @@ export class JobDto {
     };
   }
 
-  toPrismaCreateInput() {
+   toPrismaCreateInput(): Prisma.JobUncheckedCreateInput {
     return {
       title: this.title,
       description: this.description,
       status: this.status as JobStatus,
-      lastStatus: this.lastStatus as JobStatus,
-      stage: this.stage as JobStage,
+      lastStatus: (this.lastStatus as JobStatus) ?? null,
+      stage: (this.stage as JobStage) ?? null,
       role: this.role,
       location: this.location,
       workMode: this.workMode,
@@ -95,13 +96,11 @@ export class JobDto {
       notes: this.notes,
       salary: this.salary,
       contactEmail: this.contactEmail,
-      appliedAt: this.appliedAt,
+      appliedAt: this.appliedAt ?? null,
       link: this.link,
       company: this.company,
       wheresApplied: this.wheresApplied,
-      applier: {
-        connect: { id: this.applierId },
-      },
+      applierId: this.applierId,
     };
   }
 

@@ -1,4 +1,4 @@
-import { Timeline_Entry } from "@/app/generated/prisma/client";
+import { Prisma, Timeline_Entry } from "@/app/generated/prisma/client";
 
 export class Timeline_EntryDto {
   id?: bigint;
@@ -25,13 +25,12 @@ export class Timeline_EntryDto {
     };
   }
 
-  toPrismaCreateInput() {
+  toPrismaCreateInput(): Prisma.Timeline_EntryUncheckedCreateInput {
     return {
       label: this.label,
       notes: this.notes,
-      job: {
-        connect: { id: this.jobId },
-      },
+      jobId: this.jobId,
+      date: this.date || new Date(),
     };
   }
 

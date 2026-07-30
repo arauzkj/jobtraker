@@ -47,9 +47,10 @@ export class JobService {
     }
   }
 
-  static async createJob(jobData: Omit<Job, "id">) {
+  static async createJob(jobData: Partial<JobDto>) {
     try {
-      const job: Job = await JobRepository.create(jobData);
+      const jobDto = new JobDto(jobData);
+      const job: Job = await JobRepository.create(jobDto.toPrismaCreateInput());
       return JobDto.fromPrisma(job).toJSON();
     } catch (error) {
       console.error("Error al crear la oferta de trabajo:", error);

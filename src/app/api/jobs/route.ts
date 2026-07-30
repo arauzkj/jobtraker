@@ -1,3 +1,4 @@
+import { JobDto } from "@/dto/job.dto";
 import { auth } from "@/lib/auth";
 import { JobService } from "@/services/job.service";
 import { headers } from "next/headers";
@@ -35,5 +36,13 @@ export async function POST(request: Request) {
     );
   }
 
-  
+  try {
+    const jobData = await request.json();
+    
+    const job = await JobService.createJob(jobData);
+    return Response.json({ data: job }, { status: 201 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unexpected error";
+    return Response.json({ error: message }, { status: 500 });
+  }
 }

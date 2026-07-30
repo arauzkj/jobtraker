@@ -52,11 +52,10 @@ export const STATUS_META: Record<
     badge: "bg-info/10 text-info-foreground border-info/20",
     dot: "bg-info",
   },
-    ACCEPTED: {
+  ACCEPTED: {
     label: "Aceptado",
     description: "Has aceptado la oferta",
     badge: "bg-success/15 text-success-foreground border-success/25",
     dot: "bg-success",
   },
-
-}
+};

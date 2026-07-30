@@ -5,5 +5,9 @@ export const STAGE_ORDER: JobStageDto[] = [
     JobStageDto.PHONE_SCREEN,
     JobStageDto.TECHNICAL_INTERVIEW,
     JobStageDto.TEAM_INTERVIEW,
-    JobStageDto.FINAL_INTERVIEW
+    JobStageDto.FINAL_INTERVIEW,
+    JobStageDto.OFFER,
+    JobStageDto.REJECTED,
+    JobStageDto.WITHDRAWN,
+    JobStageDto.ACCEPTED,
 ]
