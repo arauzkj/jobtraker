@@ -33,21 +33,20 @@ export default function Home() {
             });
             router.push("/dashboard");
           },
+          onError: () => {
+            setLoading(false);
+            setShake(true);
+            setTimeout(() => setShake(false), 500);
+
+            toast.add({
+              title: "No se pudo iniciar sesión",
+              description: "Revisa tus credenciales e intenta de nuevo.",
+              type: "error",
+            });
+            return;
+          },
         },
       });
-
-      if (error) {
-        setLoading(false);
-        setShake(true);
-        setTimeout(() => setShake(false), 500);
-
-        toast.add({
-          title: "No se pudo iniciar sesión",
-          description: "Revisa tus credenciales e intenta de nuevo.",
-          type: "error",
-        });
-        return;
-      }
     } else {
       const { data, error } = await authClient.signIn.username({
         username: dataForm.get("email") as string,
@@ -63,21 +62,20 @@ export default function Home() {
             });
             router.push("/dashboard");
           },
+          onError: () => {
+            setLoading(false);
+            setShake(true);
+            setTimeout(() => setShake(false), 500);
+
+            toast.add({
+              title: "No se pudo iniciar sesión",
+              description: "Revisa tus credenciales e intenta de nuevo.",
+              type: "error",
+            });
+            return;
+          },
         },
       });
-
-      if (error) {
-        setLoading(false);
-        setShake(true);
-        setTimeout(() => setShake(false), 500);
-
-        toast.add({
-          title: "No se pudo iniciar sesión",
-          description: "Revisa tus credenciales e intenta de nuevo.",
-          type: "error",
-        });
-        return;
-      }
     }
   }
 
