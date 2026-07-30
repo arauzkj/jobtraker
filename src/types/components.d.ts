@@ -82,6 +82,8 @@ interface RegisterProps{
   available: boolean | null;
   loading: boolean;
   onSubmit: (data: FormData) => void;
+  submitting: boolean;
+  shake: boolean;
 }
 
 interface NewJobProps{

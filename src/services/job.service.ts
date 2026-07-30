@@ -32,4 +32,28 @@ export class JobService {
       throw new Error("Ocurrió un error al procesar la oferta de trabajo");
     }
   }
+
+  static async AllJobsByApplierId(applierId: bigint) {
+    try{
+      const jobs: Job[] = await JobRepository.findAllByApplierId(applierId);
+      if (!jobs || jobs.length === 0) {
+        return [];
+      }
+      const jobsDto: JobDto[] = jobs.map((job) => JobDto.fromPrisma(job));
+      return jobsDto.map((jobDto) => jobDto.toJSON());
+    }catch(error){
+      console.error("Error al procesar las ofertas de trabajo por aplicante:", error);
+      throw new Error("Ocurrió un error al procesar las ofertas de trabajo por aplicante");
+    }
+  }
+
+  static async createJob(jobData: Omit<Job, "id">) {
+    try {
+      const job: Job = await JobRepository.create(jobData);
+      return JobDto.fromPrisma(job).toJSON();
+    } catch (error) {
+      console.error("Error al crear la oferta de trabajo:", error);
+      throw new Error("Ocurrió un error al crear la oferta de trabajo");
+    }
+  }
 }

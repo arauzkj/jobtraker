@@ -18,6 +18,7 @@ import { JobDetailSheet } from "./job-detail-sheet";
 import { JobDto } from "@/dto/job.dto";
 import { STATUS_META } from "@/dto/status.const";
 import { NewJobSheet } from "./new_job";
+import { authClient } from "@/lib/auth-client";
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
@@ -120,8 +121,14 @@ export function Dashboard() {
 
   function handleCreate() {}
 
-  const handleLogout = () => {
-    router.push("/");
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: ()  => {
+          router.push("/");
+        }
+      }
+    });
   };
 
   function openNew() {

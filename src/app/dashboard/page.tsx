@@ -9,6 +9,10 @@ export default async function DashboardPage() {
     headers: await headers(),
   });
 
+  if(!session){
+    redirect("/");
+  }
+
   return (
     <div className="relative">
       <SceneBackground
