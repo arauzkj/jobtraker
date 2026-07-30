@@ -27,6 +27,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     async function checkUsernameAvailability() {
+      if (username.length <= 3) return null;
       setLoading(true);
       try {
         const result = await authClient.isUsernameAvailable({
