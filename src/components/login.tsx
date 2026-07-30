@@ -84,7 +84,7 @@ export function Login({
                 </InputGroupAddon>
                 <InputGroupInput
                   id="email"
-                  type="email"
+                  name="email"
                   placeholder="tucorreo@ejemplo.com"
                   autoComplete="email"
                 />

@@ -1,4 +1,12 @@
-import { AtSign, BriefcaseBusiness, Check, Loader2, Mail, User, X } from "lucide-react";
+import {
+  AtSign,
+  BriefcaseBusiness,
+  Check,
+  Loader2,
+  Mail,
+  User,
+  X,
+} from "lucide-react";
 import { AuthBrandPanel } from "./auth-brand-panel";
 import { AuthCard } from "./auth-card";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
@@ -10,6 +18,7 @@ import {
 import { PasswordField } from "../shared/password-field";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { Spinner } from "../ui/spinner";
 
 export function Register({
   showPassword,
@@ -19,6 +28,8 @@ export function Register({
   setUsername,
   available,
   loading,
+  submitting,
+  shake,
 }: RegisterProps) {
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -142,12 +153,13 @@ export function Register({
                 />
               </InputGroup>
               {/* Feedback de disponibilidad */}
-              <div className="mt-1.5 min-h-5">
-                {usernameFeedback()}
-              </div>
+              <div className="mt-1.5 min-h-5">{usernameFeedback()}</div>
             </Field>
 
-            <PasswordField setShowPassword={setShowPassword} showPassword={showPassword} />
+            <PasswordField
+              setShowPassword={setShowPassword}
+              showPassword={showPassword}
+            />
 
             <label className="flex items-start gap-2 text-sm text-muted-foreground">
               <input
@@ -163,9 +175,19 @@ export function Register({
 
             <Button
               type="submit"
-              className="mt-1 w-full font-mono tracking-wide uppercase"
+              disabled={submitting}
+              className={`mt-1 w-full font-mono tracking-wide uppercase ${
+                shake ? "animate-shake" : ""
+              }`}
             >
-              Crear cuenta
+              {submitting ? (
+                <>
+                  <Spinner className="size-4" />
+                  Creando cuenta...
+                </>
+              ) : (
+                "Crear cuenta"
+              )}
             </Button>
           </FieldGroup>
         </form>

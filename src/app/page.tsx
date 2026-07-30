@@ -13,33 +13,72 @@ export default function Home() {
   const [shake, setShake] = useState(false);
 
   async function handleSubmit(dataForm: FormData) {
+    const email = dataForm.get("email");
+
+    const isValidEmail =
+      typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     setLoading(true);
-
-    const { data, error } = await authClient.signIn.email({
-      email: dataForm.get("email") as string,
-      password: dataForm.get("password") as string,
-      callbackURL: "/dashboard"
-    });
-
-    if (error) {
-      setLoading(false);
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
-
-      toast.add({
-        title: "No se pudo iniciar sesión",
-        description: "Revisa tus credenciales e intenta de nuevo.",
-        type: "error",
+    if (isValidEmail) {
+      const { data, error } = await authClient.signIn.email({
+        email: dataForm.get("email") as string,
+        password: dataForm.get("password") as string,
+        callbackURL: "/dashboard",
+        fetchOptions: {
+          onSuccess: () => {
+            toast.add({
+              title: "Sesión iniciada",
+              description: "Bienvenido de vuelta a Trayecto.",
+              type: "success",
+              timeout: 3000,
+            });
+            router.push("/dashboard");
+          },
+        },
       });
-      return;
+
+      if (error) {
+        setLoading(false);
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+
+        toast.add({
+          title: "No se pudo iniciar sesión",
+          description: "Revisa tus credenciales e intenta de nuevo.",
+          type: "error",
+        });
+        return;
+      }
+    } else {
+      const { data, error } = await authClient.signIn.username({
+        username: dataForm.get("email") as string,
+        password: dataForm.get("password") as string,
+        callbackURL: "/dashboard",
+        fetchOptions: {
+          onSuccess: () => {
+            toast.add({
+              title: "Sesión iniciada",
+              description: "Bienvenido de vuelta a Trayecto.",
+              type: "success",
+              timeout: 3000,
+            });
+            router.push("/dashboard");
+          },
+        },
+      });
+
+      if (error) {
+        setLoading(false);
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+
+        toast.add({
+          title: "No se pudo iniciar sesión",
+          description: "Revisa tus credenciales e intenta de nuevo.",
+          type: "error",
+        });
+        return;
+      }
     }
-
-    toast.add({
-      title: "Sesión iniciada",
-      description: "Bienvenido de vuelta a Trayecto.",
-      type: "success",
-    });
-
   }
 
   return (

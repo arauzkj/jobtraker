@@ -14,15 +14,31 @@ export default function RegisterPage() {
   const debouncedUsername = useDebounce(username, 500);
   const [available, setAvailable] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [shake, setShake] = useState(false);
 
   async function handleSubmit(dataForm: FormData) {
+    setSubmitting(true);
     const { data, error } = await authClient.signUp.email({
       email: dataForm.get("email") as string,
       password: dataForm.get("password") as string,
-      name: "",
-      username: "",
+      name: dataForm.get("name") as string,
+      username: dataForm.get("username") as string,
+
       callbackURL: "/",
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: () => {
+          setShake(true);
+          setTimeout(() => setShake(false), 500);
+          return;
+        },
+      },
     });
+    setSubmitting(false);
+
   }
 
   useEffect(() => {
@@ -59,6 +75,8 @@ export default function RegisterPage() {
         username={username}
         available={available}
         loading={loading}
+        submitting={submitting}
+        shake={shake}
       ></Register>
     </main>
   );
