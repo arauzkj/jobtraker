@@ -22,3 +22,26 @@ export async function GET(
   const job = await JobService.getJobById(BigInt(id));
   return Response.json({ data: job }, { status: 200 });
 }
+
+
+
+export async function DELETE(
+  _req: NextRequest,
+  ctx: RouteContext<"/api/jobs/[id]">,
+){
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return Response.json(
+      { error: "Unauthorized access" },
+      { status: 401 },
+    );
+  }
+
+  const { id } = await ctx.params;
+  
+  return Response.json({ data: null }, { status: 200 });
+
+}
