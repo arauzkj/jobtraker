@@ -20,6 +20,7 @@ import { STATUS_META } from "@/dto/status.const";
 import { NewJobSheet } from "./new_job";
 import { authClient } from "@/lib/auth-client";
 import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
+import { Timeline_EntryDto } from "@/dto/timeline_entry.dto";
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
@@ -154,18 +155,65 @@ export function Dashboard() {
     setOpen(false);
   }
 
+  async function handleStatusChange(job: JobDto, status: JobStatusDto) {
+    const response = await fetch(`/api/jobs/${job.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updated = new JobDto(data.data as any);
+    setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
+    setSelected(updated);
+  }
+
+  async function handleAddTimeline(
+    jobId: bigint,
+    entry: { label: string; notes: string; stage?: string },
+  ) {
+    const response = await fetch("/api/timeline_entry", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jobId: jobId.toString(), ...entry }),
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    // Append the new entry to the selected job's timeline (keep stage for display)
+    const newEntry = Object.assign(new Timeline_EntryDto(data.data), {
+      stage: entry.stage,
+    });
+    setJobs((prev) =>
+      prev.map((j) => {
+        if (j.id !== jobId) return j;
+        return new JobDto({
+          ...j,
+          timeline: [...(j.timeline ?? []), newEntry],
+        });
+      }),
+    );
+    setSelected((prev) => {
+      if (!prev || prev.id !== jobId) return prev;
+      return new JobDto({
+        ...prev,
+        timeline: [...(prev.timeline ?? []), newEntry],
+      });
+    });
+  }
+
   async function handleCreate(dataForm: FormData) {
     const newJob = new JobDto(
       Object.fromEntries(dataForm.entries()) as Partial<JobDto>,
     );
 
-    const response = await fetch("/api/jobs",{
+    const response = await fetch("/api/jobs", {
       body: JSON.stringify(newJob.toJSON()),
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
   }
 
   return (
@@ -232,6 +280,8 @@ export function Dashboard() {
         onOpenChange={setOpen}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
+        onAddTimeline={handleAddTimeline}
       />
       <NewJobSheet
         open={formOpen}

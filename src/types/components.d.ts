@@ -92,4 +92,6 @@ interface JobDetailSheetProps{
   onOpenChange: (open: boolean) => void
   onEdit?: (job: JobDto) => void
   onDelete?: (job: JobDto) => void
+  onStatusChange?: (job: JobDto, status: JobStatusDto) => Promise<void>
+  onAddTimeline?: (jobId: bigint, entry: { label: string; notes: string; stage?: string }) => Promise<void>
 }

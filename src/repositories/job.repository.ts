@@ -55,6 +55,23 @@ export class JobRepository {
   }
 
 
+  static async update(
+    id: bigint,
+    data: Prisma.JobUncheckedUpdateInput,
+  ): Promise<Job> {
+    try {
+      const job: Job = await prisma.job.update({
+        where: { id },
+        data,
+        include: { timeline: true },
+      });
+      return job;
+    } catch (error) {
+      console.error("Error al actualizar la oferta de trabajo:", error);
+      throw new Error("No se pudo actualizar la oferta de trabajo");
+    }
+  }
+
   static async delete(id: bigint) {
     try {
       await prisma.job.delete({

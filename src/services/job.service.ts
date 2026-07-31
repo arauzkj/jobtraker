@@ -63,6 +63,16 @@ export class JobService {
     }
   }
 
+  static async updateJobStatus(id: bigint, status: string) {
+    try {
+      const job = await JobRepository.update(id, { status } as Parameters<typeof JobRepository.update>[1]);
+      return JobDto.fromPrisma(job).toJSON();
+    } catch (error) {
+      console.error("Error al actualizar el estado del trabajo:", error);
+      throw new Error("Ocurrió un error al actualizar el estado del trabajo");
+    }
+  }
+
   static async deleteJob(id: bigint) {
     try {
       await JobRepository.delete(id);
