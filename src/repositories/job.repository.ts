@@ -53,4 +53,16 @@ export class JobRepository {
       throw new Error("No se pudo crear la oferta de trabajo");
     }
   }
+
+
+  static async delete(id: bigint) {
+    try {
+      await prisma.job.delete({
+        where: { id },
+      });
+    } catch (error) {
+      console.error("Error al eliminar la oferta de trabajo:", error);
+      throw new Error("No se pudo eliminar la oferta de trabajo");
+    }
+  }
 }

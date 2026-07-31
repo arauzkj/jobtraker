@@ -10,7 +10,7 @@ export class JobService {
         return [];
       }
       const jobsDto: JobDto[] = jobs.map((job) => JobDto.fromPrisma(job));
-      
+
       return jobsDto.map((jobDto) => jobDto.toJSON());
     } catch (error) {
       console.error("Error al procesar la lista de ofertas de trabajo:", error);
@@ -34,16 +34,21 @@ export class JobService {
   }
 
   static async AllJobsByApplierId(applierId: bigint) {
-    try{
+    try {
       const jobs: Job[] = await JobRepository.findAllByApplierId(applierId);
       if (!jobs || jobs.length === 0) {
         return [];
       }
       const jobsDto: JobDto[] = jobs.map((job) => JobDto.fromPrisma(job));
       return jobsDto.map((jobDto) => jobDto.toJSON());
-    }catch(error){
-      console.error("Error al procesar las ofertas de trabajo por aplicante:", error);
-      throw new Error("Ocurrió un error al procesar las ofertas de trabajo por aplicante");
+    } catch (error) {
+      console.error(
+        "Error al procesar las ofertas de trabajo por aplicante:",
+        error,
+      );
+      throw new Error(
+        "Ocurrió un error al procesar las ofertas de trabajo por aplicante",
+      );
     }
   }
 
@@ -55,6 +60,15 @@ export class JobService {
     } catch (error) {
       console.error("Error al crear la oferta de trabajo:", error);
       throw new Error("Ocurrió un error al crear la oferta de trabajo");
+    }
+  }
+
+  static async deleteJob(id: bigint) {
+    try {
+      await JobRepository.delete(id);
+    } catch (error) {
+      console.error("Error al eliminar la oferta de trabajo:", error);
+      throw new Error("Ocurrió un error al eliminar la oferta de trabajo");
     }
   }
 }
