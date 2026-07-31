@@ -29,7 +29,7 @@ export class JobDto {
   link: string;
   company: string;
   wheresApplied: string;
-  applierId: bigint;
+  applierId?: bigint;
   timeline?: Timeline_EntryDto[];
 
   constructor(data: Partial<JobDto>) {
@@ -52,7 +52,7 @@ export class JobDto {
     this.link = data.link || "";
     this.company = data.company || "";
     this.wheresApplied = data.wheresApplied || "";
-    this.applierId = data.applierId!;
+    this.applierId = data.applierId;
     this.timeline = data.timeline;
   }
 
@@ -77,12 +77,15 @@ export class JobDto {
       link: this.link,
       company: this.company,
       wheresApplied: this.wheresApplied,
-      applierId: this.applierId.toString(),
+      applierId: this.applierId?.toString(),
       timeline: this.timeline?.map((t) => t.toJSON()),
     };
   }
 
-   toPrismaCreateInput(): Prisma.JobUncheckedCreateInput {
+  toPrismaCreateInput(): Prisma.JobUncheckedCreateInput {
+    if (this.applierId === undefined) {
+      throw new Error("applierId is required to persist a Job");
+    }
     return {
       title: this.title,
       description: this.description,

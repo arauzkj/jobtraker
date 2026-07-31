@@ -38,8 +38,11 @@ export async function POST(request: Request) {
 
   try {
     const jobData = await request.json();
-    
-    const job = await JobService.createJob(jobData);
+
+    const job = await JobService.createJob({
+      ...jobData,
+      applierId: BigInt(session.user.id),
+    });
     return Response.json({ data: job }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected error";

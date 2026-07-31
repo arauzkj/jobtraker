@@ -154,6 +154,14 @@ export function Dashboard() {
     const newJob = new JobDto(
       Object.fromEntries(dataForm.entries()) as Partial<JobDto>,
     );
+
+    const response = await fetch("/api/jobs",{
+      body: JSON.stringify(newJob.toJSON()),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
   }
 
   return (
