@@ -146,7 +146,10 @@ export function Dashboard() {
     setSelected((prev) => (prev && prev.id === updated.id ? updated : prev));
   }
 
-  function handleDelete(job: JobDto) {
+  async function handleDelete(job: JobDto) {
+    await fetch(`/api/jobs/${job.id}`, {
+      method: "DELETE",
+    });
     setJobs((prev) => prev.filter((j) => j.id !== job.id));
     setOpen(false);
   }
