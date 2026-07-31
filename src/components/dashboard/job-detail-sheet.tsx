@@ -10,6 +10,7 @@ import { JobDto } from "@/dto/job.dto"
 import { STAGE_ORDER } from "@/dto/stage_order.const"
 import { STAGE_META } from "@/dto/stage_meta.const"
 import { Timeline_EntryDto } from "@/dto/timeline_entry.dto"
+import { JobStatusDto } from "@/dto/jobstatus.dto.enum"
 
 
 
@@ -137,7 +138,7 @@ export function JobDetailSheet({
                   />
                 </div>
 
-                {job.status === "interview" && (
+                {job.status === JobStatusDto.INTERVIEW && (
                   <>
                     <Separator />
                     <StageProgress job={job} />

@@ -53,7 +53,7 @@ export class JobDto {
     this.company = data.company || "";
     this.wheresApplied = data.wheresApplied || "";
     this.applierId = data.applierId;
-    this.timeline = data.timeline;
+    this.timeline = data.timeline ?? [];
   }
 
   toJSON() {

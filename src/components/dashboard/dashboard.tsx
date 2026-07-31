@@ -19,24 +19,25 @@ import { JobDto } from "@/dto/job.dto";
 import { STATUS_META } from "@/dto/status.const";
 import { NewJobSheet } from "./new_job";
 import { authClient } from "@/lib/auth-client";
+import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
-  { key: "pending" as const, label: "Pendientes", icon: CalendarClock },
-  { key: "interview" as const, label: "En entrevista", icon: Users },
-  { key: "no_response" as const, label: "Sin respuesta", icon: CircleSlash },
-  { key: "offer" as const, label: "Ofertas", icon: Trophy },
-  { key: "rejected" as const, label: "Rechazados", icon: XCircle },
+  { key: JobStatusDto.PENDENTING, label: "Pendientes", icon: CalendarClock },
+  { key: JobStatusDto.INTERVIEW, label: "En entrevista", icon: Users },
+  { key: JobStatusDto.UNANSWERED, label: "Sin respuesta", icon: CircleSlash },
+  { key: JobStatusDto.OFFER, label: "Ofertas", icon: Trophy },
+  { key: JobStatusDto.REJECTED, label: "Rechazados", icon: XCircle },
 ] as const;
 
 export const FILTERS = [
   { value: "all" as const, label: "Todos" },
-  { value: "pending" as const, label: "Pendiente" },
-  { value: "interview" as const, label: "En entrevista" },
-  { value: "no_response" as const, label: "Sin respuesta" },
-  { value: "offer" as const, label: "Oferta" },
-  { value: "rejected" as const, label: "Rechazado" },
-  { value: "withdrawn" as const, label: "Retirado" },
+  { value: JobStatusDto.PENDENTING, label: "Pendiente" },
+  { value: JobStatusDto.INTERVIEW, label: "En entrevista" },
+  { value: JobStatusDto.UNANSWERED, label: "Sin respuesta" },
+  { value: JobStatusDto.OFFER, label: "Oferta" },
+  { value: JobStatusDto.REJECTED, label: "Rechazado" },
+  { value: JobStatusDto.WITHDRAWN, label: "Retirado" },
 ] as const;
 
 export type FilterValue = (typeof FILTERS)[number]["value"];
@@ -102,7 +103,7 @@ export function Dashboard() {
 
   const filtered = useMemo(() => {
     return jobs.filter((j) => {
-      const matchStatus = filter === "all" || j.status.toString() === filter;
+      const matchStatus = filter === "all" || j.status === filter;
       const q = query.trim().toLowerCase();
       const matchQuery =
         !q ||
