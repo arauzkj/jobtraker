@@ -119,9 +119,8 @@ export function NewJobSheet({
             </div>
           </div>
         </SheetHeader>
-
         <form id="new-job-form" onSubmit={handleSubmit} className="contents">
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 min-h-0">
             <FieldGroup className="p-6">
               <Field>
                 <FieldLabel htmlFor="role">Puesto</FieldLabel>
