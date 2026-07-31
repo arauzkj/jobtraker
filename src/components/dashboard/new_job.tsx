@@ -18,24 +18,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useEffect, useState } from "react";
 import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
 import { STATUS_META } from "@/dto/status.const";
 import { JobDto } from "@/dto/job.dto";
+import { useEffect, useState } from "react";
 
-const emptyForm = {
+const EMPTY_JOB: Partial<JobDto> = {
   role: "",
   company: "",
   location: "",
-  workMode: "Remoto",
+  workMode: "",
   salary: "",
-  source: "",
-  status: JobStatusDto.PENDENTING,
+  wheresApplied: "",
+  status: "APPLIED" as JobStatusDto,
   contact: "",
   contactEmail: "",
-  url: "",
+  link: "",
   notes: "",
 };
+
+const WORK_MODES = ["Remoto", "Híbrido", "Presencial"];
 
 export function NewJobSheet({
   open,
@@ -44,26 +46,52 @@ export function NewJobSheet({
   onUpdate,
   job = null,
 }: NewJobProps) {
-  const WORK_MODES = ["Remoto", "Híbrido", "Presencial"];
-  const [form, setForm] = useState(emptyForm);
   const isEditing = Boolean(job);
+  const [form, setForm] = useState<Partial<JobDto>>(EMPTY_JOB);
 
-  function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  useEffect(() => {
+    if (!open) return;
+
+    if (job) {
+      setForm({
+        role: job.role,
+        company: job.company,
+        location: job.location,
+        workMode: job.workMode,
+        salary: job.salary,
+        wheresApplied: job.wheresApplied,
+        status: job.status,
+        contact: job.contact,
+        contactEmail: job.contactEmail,
+        link: job.link,
+        notes: job.notes,
+      });
+    } else {
+      setForm(EMPTY_JOB);
+    }
+  }, [job, open]);
+
+  function updateField<K extends keyof Partial<JobDto>>(
+    key: K,
+    value: Partial<JobDto>[K],
+  ) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  useEffect(()=>{
-    if(!open) return
-    if(job){
-      return
-    }else{
-      return
-    }
-  }, [job,open]);
-
-  function handleSubmit(e: React.SubmitEvent) {
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    if (isEditing) {
+      onUpdate?.(formData);
+    } else {
+      onCreate?.(formData);
+    }
 
+    onOpenChange(false);
+  }
+
+  function handleCancel() {
+    setForm(job ? { ...form } : EMPTY_JOB);
     onOpenChange(false);
   }
 
@@ -73,7 +101,11 @@ export function NewJobSheet({
         <SheetHeader className="gap-3 border-b p-6">
           <div className="flex items-start gap-3">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              {isEditing ? <Pencil className="size-5" /> : <Briefcase className="size-5" />}
+              {isEditing ? (
+                <Pencil className="size-5" />
+              ) : (
+                <Briefcase className="size-5" />
+              )}
             </span>
             <div className="flex flex-col gap-1">
               <SheetTitle className="text-lg leading-tight">
@@ -88,20 +120,17 @@ export function NewJobSheet({
           </div>
         </SheetHeader>
 
-        <form
-          id="new-job-form"
-          onSubmit={handleSubmit}
-          className="contents"
-        >
+        <form id="new-job-form" onSubmit={handleSubmit} className="contents">
           <ScrollArea className="flex-1">
             <FieldGroup className="p-6">
               <Field>
                 <FieldLabel htmlFor="role">Puesto</FieldLabel>
                 <Input
                   id="role"
+                  name="role"
                   placeholder="Frontend Engineer"
                   value={form.role}
-                  onChange={(e) => set("role", e.target.value)}
+                  onChange={(e) => updateField("role", e.target.value)}
                 />
               </Field>
 
@@ -109,9 +138,10 @@ export function NewJobSheet({
                 <FieldLabel htmlFor="company">Empresa</FieldLabel>
                 <Input
                   id="company"
+                  name="company"
                   placeholder="Nebula Labs"
                   value={form.company}
-                  onChange={(e) => set("company", e.target.value)}
+                  onChange={(e) => updateField("company", e.target.value)}
                 />
               </Field>
 
@@ -120,19 +150,23 @@ export function NewJobSheet({
                   <FieldLabel htmlFor="location">Ubicación</FieldLabel>
                   <Input
                     id="location"
+                    name="location"
                     placeholder="Ciudad de México"
                     value={form.location}
-                    onChange={(e) => set("location", e.target.value)}
+                    onChange={(e) => updateField("location", e.target.value)}
                   />
                 </Field>
                 <Field>
                   <FieldLabel>Modalidad</FieldLabel>
                   <Select
+                    name="workMode"
                     value={form.workMode}
-                    onValueChange={(v) => set("workMode", v as typeof form.workMode)}
+                    onValueChange={(value) =>
+                      updateField("workMode", value as string)
+                    }
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue />
+                      <SelectValue placeholder="Selecciona modalidad" />
                     </SelectTrigger>
                     <SelectContent>
                       {WORK_MODES.map((m) => (
@@ -150,18 +184,22 @@ export function NewJobSheet({
                   <FieldLabel htmlFor="salary">Salario</FieldLabel>
                   <Input
                     id="salary"
+                    name="salary"
                     placeholder="$4,500 USD"
                     value={form.salary}
-                    onChange={(e) => set("salary", e.target.value)}
+                    onChange={(e) => updateField("salary", e.target.value)}
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="source">Fuente</FieldLabel>
+                  <FieldLabel htmlFor="wheresApplied">Fuente</FieldLabel>
                   <Input
-                    id="source"
+                    id="wheresApplied"
+                    name="wheresApplied"
                     placeholder="LinkedIn"
-                    value={form.source}
-                    onChange={(e) => set("source", e.target.value)}
+                    value={form.wheresApplied}
+                    onChange={(e) =>
+                      updateField("wheresApplied", e.target.value)
+                    }
                   />
                 </Field>
               </div>
@@ -169,13 +207,14 @@ export function NewJobSheet({
               <Field>
                 <FieldLabel>Estado</FieldLabel>
                 <Select
+                  name="status"
                   value={form.status}
-                  onValueChange={(v) => set("status", v as JobStatusDto)}
+                  onValueChange={(value) =>
+                    updateField("status", value as JobStatusDto)
+                  }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {(value: JobStatusDto) => STATUS_META[value].label}
-                    </SelectValue>
+                    <SelectValue placeholder="Selecciona un estado" />
                   </SelectTrigger>
                   <SelectContent>
                     {(Object.keys(STATUS_META) as JobStatusDto[]).map((s) => (
@@ -192,30 +231,37 @@ export function NewJobSheet({
                   <FieldLabel htmlFor="contact">Contacto</FieldLabel>
                   <Input
                     id="contact"
+                    name="contact"
                     placeholder="Laura Méndez"
                     value={form.contact}
-                    onChange={(e) => set("contact", e.target.value)}
+                    onChange={(e) => updateField("contact", e.target.value)}
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="contactEmail">Correo de contacto</FieldLabel>
+                  <FieldLabel htmlFor="contactEmail">
+                    Correo de contacto
+                  </FieldLabel>
                   <Input
                     id="contactEmail"
+                    name="contactEmail"
                     type="email"
                     placeholder="laura@empresa.com"
                     value={form.contactEmail}
-                    onChange={(e) => set("contactEmail", e.target.value)}
+                    onChange={(e) =>
+                      updateField("contactEmail", e.target.value)
+                    }
                   />
                 </Field>
               </div>
 
               <Field>
-                <FieldLabel htmlFor="url">Enlace de la oferta</FieldLabel>
+                <FieldLabel htmlFor="link">Enlace de la oferta</FieldLabel>
                 <Input
-                  id="url"
+                  id="link"
+                  name="link"
                   placeholder="https://..."
-                  value={form.url}
-                  onChange={(e) => set("url", e.target.value)}
+                  value={form.link}
+                  onChange={(e) => updateField("link", e.target.value)}
                 />
               </Field>
 
@@ -223,10 +269,11 @@ export function NewJobSheet({
                 <FieldLabel htmlFor="notes">Notas</FieldLabel>
                 <textarea
                   id="notes"
+                  name="notes"
                   rows={3}
                   placeholder="Detalles del proceso, seguimiento, etc."
                   value={form.notes}
-                  onChange={(e) => set("notes", e.target.value)}
+                  onChange={(e) => updateField("notes", e.target.value)}
                   className="min-h-20 w-full resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
                 />
               </Field>
@@ -238,7 +285,7 @@ export function NewJobSheet({
               type="button"
               variant="outline"
               className="flex-1"
-              onClick={() => onOpenChange(false)}
+              onClick={handleCancel}
             >
               Cancelar
             </Button>

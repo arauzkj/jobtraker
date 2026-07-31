@@ -119,15 +119,13 @@ export function Dashboard() {
     setOpen(true);
   };
 
-  function handleCreate() {}
-
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
-        onSuccess: ()  => {
+        onSuccess: () => {
           router.push("/");
-        }
-      }
+        },
+      },
     });
   };
 
@@ -142,7 +140,7 @@ export function Dashboard() {
     setTimeout(() => setFormOpen(true), 250);
   }
 
-  function handleUpdate(updated: JobDto) {
+  async function handleUpdate(updated: JobDto) {
     setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
     setSelected((prev) => (prev && prev.id === updated.id ? updated : prev));
   }
@@ -150,6 +148,12 @@ export function Dashboard() {
   function handleDelete(job: JobDto) {
     setJobs((prev) => prev.filter((j) => j.id !== job.id));
     setOpen(false);
+  }
+
+  async function handleCreate(dataForm: FormData) {
+    const newJob = new JobDto(
+      Object.fromEntries(dataForm.entries()) as Partial<JobDto>,
+    );
   }
 
   return (
