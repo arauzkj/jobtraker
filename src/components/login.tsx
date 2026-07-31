@@ -1,3 +1,5 @@
+"use client";
+
 import { BriefcaseBusiness, Mail } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
@@ -8,21 +10,72 @@ import {
 import { Button } from "@/components/ui/button";
 import { PasswordField } from "@/components/shared/password-field";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@/components/ui/toast";
 import { Spinner } from "./ui/spinner";
 
-export function Login({
-  showPassword,
-  setShowPassword,
-  onSubmit,
-  loading,
-  shake,
-}: LoginProps) {
+export function Login() {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [shake, setShake] = useState(false);
+
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
+    const email = formData.get("email");
+    const isValidEmail =
+      typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    onSubmit(formData);
+    setLoading(true);
+
+    const onSuccess = () => {
+      toast.add({
+        title: "Sesión iniciada",
+        description: "Bienvenido de vuelta a Trayecto.",
+        type: "success",
+        timeout: 3000,
+      });
+      router.push("/dashboard");
+    };
+
+    const onError = () => {
+      setLoading(false);
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+
+      toast.add({
+        title: "No se pudo iniciar sesión",
+        description: "Revisa tus credenciales e intenta de nuevo.",
+        type: "error",
+      });
+    };
+
+    if (isValidEmail) {
+      void authClient.signIn.email({
+        email: email,
+        password: formData.get("password") as string,
+        callbackURL: "/dashboard",
+        fetchOptions: {
+          onSuccess,
+          onError,
+        },
+      });
+      return;
+    }
+
+    void authClient.signIn.username({
+      username: email as string,
+      password: formData.get("password") as string,
+      callbackURL: "/dashboard",
+      fetchOptions: {
+        onSuccess,
+        onError,
+      },
+    });
   };
 
   return (

@@ -1,82 +1,16 @@
-"use client";
 import { SceneBackground } from "@/components/background";
 import { Login } from "@/components/login";
-import { toast } from "@/components/ui/toast";
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [shake, setShake] = useState(false);
+export default async function Home() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  async function handleSubmit(dataForm: FormData) {
-    const email = dataForm.get("email");
-
-    const isValidEmail =
-      typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    setLoading(true);
-    if (isValidEmail) {
-      const { data, error } = await authClient.signIn.email({
-        email: dataForm.get("email") as string,
-        password: dataForm.get("password") as string,
-        callbackURL: "/dashboard",
-        fetchOptions: {
-          onSuccess: () => {
-            toast.add({
-              title: "Sesión iniciada",
-              description: "Bienvenido de vuelta a Trayecto.",
-              type: "success",
-              timeout: 3000,
-            });
-            router.push("/dashboard");
-          },
-          onError: () => {
-            setLoading(false);
-            setShake(true);
-            setTimeout(() => setShake(false), 500);
-
-            toast.add({
-              title: "No se pudo iniciar sesión",
-              description: "Revisa tus credenciales e intenta de nuevo.",
-              type: "error",
-            });
-            return;
-          },
-        },
-      });
-    } else {
-      const { data, error } = await authClient.signIn.username({
-        username: dataForm.get("email") as string,
-        password: dataForm.get("password") as string,
-        callbackURL: "/dashboard",
-        fetchOptions: {
-          onSuccess: () => {
-            toast.add({
-              title: "Sesión iniciada",
-              description: "Bienvenido de vuelta a Trayecto.",
-              type: "success",
-              timeout: 3000,
-            });
-            router.push("/dashboard");
-          },
-          onError: () => {
-            setLoading(false);
-            setShake(true);
-            setTimeout(() => setShake(false), 500);
-
-            toast.add({
-              title: "No se pudo iniciar sesión",
-              description: "Revisa tus credenciales e intenta de nuevo.",
-              type: "error",
-            });
-            return;
-          },
-        },
-      });
-    }
+  if (session) {
+    redirect("/dashboard");
   }
 
   return (
@@ -87,13 +21,7 @@ export default function Home() {
       />
       <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-background/40 via-background/10 to-background/70" />
 
-      <Login
-        setShowPassword={setShowPassword}
-        showPassword={showPassword}
-        onSubmit={handleSubmit}
-        loading={loading}
-        shake={shake}
-      />
+      <Login />
     </main>
   );
 }

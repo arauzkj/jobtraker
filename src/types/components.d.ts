@@ -1,11 +1,3 @@
-interface LoginProps {
-  showPassword: boolean;
-  setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (data: FormData) => void;
-  loading: boolean;
-  shake: boolean;
-}
-
 type SceneBackgroundProps = {
   /** 0 = calm/dashboard, 1 = more visible/login */
   intensity?: number;
