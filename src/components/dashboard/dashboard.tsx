@@ -4,6 +4,9 @@ import {
   Briefcase,
   CalendarClock,
   CircleSlash,
+  FlaskConical,
+  Send,
+  BadgeCheck,
   Trophy,
   Users,
   XCircle,
@@ -24,19 +27,26 @@ import { Timeline_EntryDto } from "@/dto/timeline_entry.dto";
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
+  { key: JobStatusDto.APPLIED, label: "Postulados", icon: Send },
   { key: JobStatusDto.PENDENTING, label: "Pendientes", icon: CalendarClock },
   { key: JobStatusDto.INTERVIEW, label: "En entrevista", icon: Users },
+  { key: JobStatusDto.TECHNICAL_TEST, label: "Prueba técnica", icon: FlaskConical },
   { key: JobStatusDto.UNANSWERED, label: "Sin respuesta", icon: CircleSlash },
   { key: JobStatusDto.OFFER, label: "Ofertas", icon: Trophy },
+  { key: JobStatusDto.ACCEPTED, label: "Aceptados", icon: BadgeCheck },
   { key: JobStatusDto.REJECTED, label: "Rechazados", icon: XCircle },
+  { key: JobStatusDto.WITHDRAWN, label: "Retirados", icon: CircleSlash },
 ] as const;
 
 export const FILTERS = [
   { value: "all" as const, label: "Todos" },
+  { value: JobStatusDto.APPLIED, label: "Postulado" },
   { value: JobStatusDto.PENDENTING, label: "Pendiente" },
   { value: JobStatusDto.INTERVIEW, label: "En entrevista" },
+  { value: JobStatusDto.TECHNICAL_TEST, label: "Prueba técnica" },
   { value: JobStatusDto.UNANSWERED, label: "Sin respuesta" },
   { value: JobStatusDto.OFFER, label: "Oferta" },
+  { value: JobStatusDto.ACCEPTED, label: "Aceptado" },
   { value: JobStatusDto.REJECTED, label: "Rechazado" },
   { value: JobStatusDto.WITHDRAWN, label: "Retirado" },
 ] as const;
