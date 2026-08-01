@@ -48,8 +48,9 @@ export function DashboardHeader({
             size="icon"
             aria-label="Cerrar sesión"
             onClick={onLogout}
+            className="transition-all duration-300 ease-out hover:scale-110 hover:bg-destructive/10 hover:text-destructive"
           >
-            <LogOut />
+            <LogOut className="transition-transform duration-300"/>
           </Button>
         </div>
       </div>

@@ -53,7 +53,7 @@ export const FILTERS = [
 
 export type FilterValue = (typeof FILTERS)[number]["value"];
 
-export function Dashboard() {
+export function Dashboard({ userInitials }: DashboardProps) {
   const router = useRouter();
   const [jobs, setJobs] = useState<JobDto[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -229,7 +229,7 @@ export function Dashboard() {
   return (
     <div className="min-h-svh">
       <DashboardHeader
-        userInitials="JC"
+        userInitials={userInitials}
         onOpenChange={openNew}
         onLogout={handleLogout}
       />

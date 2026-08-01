@@ -95,3 +95,7 @@ interface JobDetailSheetProps{
   onStatusChange?: (job: JobDto, status: JobStatusDto) => Promise<void>
   onAddTimeline?: (jobId: bigint, entry: { label: string; notes: string; stage?: string }) => Promise<void>
 }
+
+interface DashboardProps {
+  userInitials: string;
+}

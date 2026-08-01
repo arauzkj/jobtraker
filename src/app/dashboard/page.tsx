@@ -9,9 +9,26 @@ export default async function DashboardPage() {
     headers: await headers(),
   });
 
-  if(!session){
+  if (!session) {
     redirect("/");
   }
+
+  function getInitials(name?: string | null) {
+    if (!name) return "?";
+
+    return name
+      .trim()
+      .split(/\s+/)
+      .map((word) => word[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }
+
+  const displayName =
+    session.user.displayUsername ?? session.user.name ?? session.user.username;
+
+  const initials = getInitials(displayName);
 
   return (
     <div className="relative">
@@ -19,7 +36,7 @@ export default async function DashboardPage() {
         intensity={0.3}
         className="pointer-events-none fixed inset-0 -z-10 opacity-40"
       />
-      <Dashboard />
+      <Dashboard userInitials={initials}/>
     </div>
   );
 }
