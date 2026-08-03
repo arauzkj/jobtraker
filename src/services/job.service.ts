@@ -1,10 +1,6 @@
 import { Job } from "@/app/generated/prisma/client";
 import { JobDto } from "@/dto/job.dto";
-import { callOpenRouterJSON } from "@/lib/openrouter-client";
-import { fetchJobPage } from "@/lib/scraping/fetch-page";
-import { extractReadableText } from "@/lib/scraping/scrap-text";
 import { JobRepository } from "@/repositories/job.repository";
-import { JobImportResult } from "@/types/job-import.types";
 
 export class JobService {
   static async getAllJobs() {
@@ -87,78 +83,4 @@ export class JobService {
       throw new Error("Ocurrió un error al eliminar la oferta de trabajo");
     }
   }
-
-  static async importJobFromLink(url: string): Promise<JobImportResult> {
-    let parsed: URL;
-    try {
-      parsed = new URL(url);
-    } catch {
-      return {
-        status: "manual_required",
-        reason: "invalid_url",
-        message: "El link no es una URL válida.",
-        sourceUrl: url,
-      };
-    }
-
-    const page = await fetchJobPage(parsed.toString());
-
-    if (page.blocked) {
-      return {
-        status: "manual_required",
-        reason: "blocked",
-        message:
-          "El sitio bloqueó el acceso automático. Completá los datos manualmente.",
-        sourceUrl: url,
-      };
-    }
-
-    const text = extractReadableText(page.html);
-    if (text.length < 100) {
-      return {
-        status: "manual_required",
-        reason: "no_content",
-        message: "No se pudo extraer contenido útil de la página.",
-        sourceUrl: url,
-      };
-    }
-
-    try {
-      const extracted = await callOpenRouterJSON(EXTRACTION_PROMPT(text));
-      return {
-        status: "ok",
-        data: extracted as Partial<JobDto>,
-        sourceUrl: url,
-      };
-    } catch {
-      return {
-        status: "manual_required",
-        reason: "ai_parse_error",
-        message:
-          "No se pudo interpretar el contenido con IA. Completá los datos manualmente.",
-        sourceUrl: url,
-      };
-    }
-  }
 }
-
-const EXTRACTION_PROMPT = (text: string) =>
-  `
-Extraé la siguiente información de esta oferta de trabajo. Respondé SOLO con un objeto JSON, sin texto adicional, sin markdown, con estas claves exactas (usá "" si no encontrás el dato, nunca null ni omitas la clave):
-
-{
-  "title": "",
-  "company": "",
-  "role": "",
-  "location": "",
-  "workMode": "",
-  "salary": "",
-  "description": "",
-  "contactEmail": ""
-}
-
-Contenido de la oferta:
-"""
-${text}
-"""
-`.trim();
