@@ -81,8 +81,8 @@ interface RegisterProps{
 interface NewJobProps{
   open: boolean
   onOpenChange: (open: boolean) => void
-  onCreate: (job: JobDto) => void
-  onUpdate?: (job: JobDto) => void
+  onCreate?: (data: FormData) => Promise<boolean>;
+  onUpdate?: (job: JobDto) => Promise<boolean>;
   job?: JobDto | null
 }
 

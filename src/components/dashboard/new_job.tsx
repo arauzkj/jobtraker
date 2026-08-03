@@ -48,6 +48,7 @@ export function NewJobSheet({
 }: NewJobProps) {
   const isEditing = Boolean(job);
   const [form, setForm] = useState<Partial<JobDto>>(EMPTY_JOB);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -78,16 +79,18 @@ export function NewJobSheet({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    if (isEditing) {
-      onUpdate?.(formData);
-    } else {
-      onCreate?.(formData);
-    }
+    setSaving(true);
+    const success = isEditing
+      ? await onUpdate?.(formData)
+      : await onCreate?.(formData);
+    setSaving(false);
 
-    onOpenChange(false);
+    if (success !== false) {
+      onOpenChange(false);
+    }
   }
 
   function handleCancel() {
@@ -288,13 +291,17 @@ export function NewJobSheet({
             >
               Cancelar
             </Button>
-            <Button type="submit" className="flex-1">
+            <Button type="submit" className="flex-1" disabled={saving}>
               {isEditing ? (
                 <Save data-icon="inline-start" />
               ) : (
                 <Building2 data-icon="inline-start" />
               )}
-              {isEditing ? "Guardar cambios" : "Guardar postulación"}
+              {saving
+                ? "Guardando..."
+                : isEditing
+                  ? "Guardar cambios"
+                  : "Guardar postulación"}
             </Button>
           </SheetFooter>
         </form>

@@ -24,6 +24,7 @@ import { NewJobSheet } from "./new_job";
 import { authClient } from "@/lib/auth-client";
 import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
 import { Timeline_EntryDto } from "@/dto/timeline_entry.dto";
+import { toast } from "../ui/toast";
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
@@ -152,9 +153,22 @@ export function Dashboard({ userInitials }: DashboardProps) {
     setTimeout(() => setFormOpen(true), 250);
   }
 
-  async function handleUpdate(updated: JobDto) {
-    setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
-    setSelected((prev) => (prev && prev.id === updated.id ? updated : prev));
+  async function handleUpdate(updated: JobDto): Promise<boolean> {
+    try {
+      setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
+      setSelected((prev) => (prev && prev.id === updated.id ? updated : prev));
+      return true;
+    } catch (error) {
+      toast.add({
+        title: "No se pudo actualizar la postulación",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Ocurrió un error inesperado",
+        type: "error",
+      });
+      return false;
+    }
   }
 
   async function handleDelete(job: JobDto) {
@@ -212,18 +226,50 @@ export function Dashboard({ userInitials }: DashboardProps) {
     });
   }
 
-  async function handleCreate(dataForm: FormData) {
+  async function handleCreate(dataForm: FormData): Promise<boolean> {
     const newJob = new JobDto(
       Object.fromEntries(dataForm.entries()) as Partial<JobDto>,
     );
 
-    const response = await fetch("/api/jobs", {
-      body: JSON.stringify(newJob.toJSON()),
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const response = await fetch("/api/jobs", {
+        body: JSON.stringify(newJob.toJSON()),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Error ${response.status}: no se pudo crear la postulación`,
+        );
+      }
+
+      const data = await response.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const created = new JobDto(data.data as any);
+
+      setJobs((prev) => [created, ...prev]);
+
+      toast.add({
+        title: "Postulación creada",
+        description: `${created.role} en ${created.company}`,
+        type: "success",
+      });
+
+      return true;
+    } catch (error) {
+      toast.add({
+        title: "No se pudo crear la postulación",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Ocurrió un error inesperado",
+        type: "error",
+      });
+      return false;
+    }
   }
 
   return (
