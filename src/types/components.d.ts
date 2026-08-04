@@ -82,7 +82,7 @@ interface NewJobProps{
   open: boolean
   onOpenChange: (open: boolean) => void
   onCreate?: (data: FormData) => Promise<boolean>;
-  onUpdate?: (job: JobDto) => Promise<boolean>;
+  onUpdate?: (data: FormData) => Promise<boolean>;
   job?: JobDto | null
 }
 

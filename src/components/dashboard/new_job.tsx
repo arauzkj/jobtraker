@@ -24,6 +24,7 @@ import { JobDto } from "@/dto/job.dto";
 import { useEffect, useState } from "react";
 
 const EMPTY_JOB: Partial<JobDto> = {
+  title: "",
   role: "",
   company: "",
   location: "",
@@ -34,6 +35,7 @@ const EMPTY_JOB: Partial<JobDto> = {
   contact: "",
   contactEmail: "",
   link: "",
+  description: "",
   notes: "",
 };
 
@@ -55,17 +57,19 @@ export function NewJobSheet({
 
     if (job) {
       setForm({
-        role: job.role,
-        company: job.company,
-        location: job.location,
-        workMode: job.workMode,
-        salary: job.salary,
-        wheresApplied: job.wheresApplied,
-        status: job.status,
-        contact: job.contact,
-        contactEmail: job.contactEmail,
-        link: job.link,
-        notes: job.notes,
+        title: job.title || "",
+        role: job.role || "",
+        company: job.company || "",
+        location: job.location || "",
+        workMode: job.workMode || "",
+        salary: job.salary || "",
+        wheresApplied: job.wheresApplied || "",
+        status: job.status || ("APPLIED" as JobStatusDto),
+        contact: job.contact || "",
+        contactEmail: job.contactEmail || "",
+        link: job.link || "",
+        description: job.description || "",
+        notes: job.notes || "",
       });
     } else {
       setForm(EMPTY_JOB);
@@ -125,6 +129,17 @@ export function NewJobSheet({
         <form id="new-job-form" onSubmit={handleSubmit} className="contents">
           <ScrollArea className="flex-1 min-h-0">
             <FieldGroup className="p-6">
+              <Field>
+                <FieldLabel htmlFor="title">Título</FieldLabel>
+                <Input
+                  id="title"
+                  name="title"
+                  placeholder="Ej. Postulación Frontend Engineer - Q3"
+                  value={form.title}
+                  onChange={(e) => updateField("title", e.target.value)}
+                />
+              </Field>
+
               <Field>
                 <FieldLabel htmlFor="role">Puesto</FieldLabel>
                 <Input
@@ -264,6 +279,19 @@ export function NewJobSheet({
                   placeholder="https://..."
                   value={form.link}
                   onChange={(e) => updateField("link", e.target.value)}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="description">Descripción</FieldLabel>
+                <textarea
+                  id="description"
+                  name="description"
+                  rows={3}
+                  placeholder="Requisitos del puesto, responsabilidades, etc."
+                  value={form.description}
+                  onChange={(e) => updateField("description", e.target.value)}
+                  className="min-h-20 w-full resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
                 />
               </Field>
 

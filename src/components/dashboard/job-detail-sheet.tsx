@@ -349,35 +349,49 @@ export function JobDetailSheet({
                 </span>
                 <div className="flex flex-col gap-1">
                   <SheetTitle className="text-lg leading-tight">
-                    {job.role}
+                    {job.title ? job.title : job.role}
                   </SheetTitle>
                   <SheetDescription className="text-sm">
-                    {job.company}
+                    {job.company} {job.title && job.role ? `· ${job.role}` : ""}
                   </SheetDescription>
                 </div>
               </div>
 
-              {/* Selector de estado */}
-              <Select
-                value={job.status}
-                onValueChange={handleStatusChange}
-                disabled={statusLoading}
-              >
-                <SelectTrigger
-                  id="job-status-select"
-                  className="w-fit gap-2 border-0 bg-transparent px-0 shadow-none focus:ring-0 focus-visible:ring-0"
-                  aria-label="Cambiar estado"
+              {/* Selector de estado y Badges de etapa / estado previo */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Select
+                  value={job.status}
+                  onValueChange={handleStatusChange}
+                  disabled={statusLoading}
                 >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(STATUS_META) as JobStatusDto[]).map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {STATUS_META[s].label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <SelectTrigger
+                    id="job-status-select"
+                    className="w-fit gap-2 border-0 bg-transparent px-0 shadow-none focus:ring-0 focus-visible:ring-0 font-medium"
+                    aria-label="Cambiar estado"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(STATUS_META) as JobStatusDto[]).map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {STATUS_META[s].label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {job.stage && (
+                  <span className="inline-flex items-center rounded-md bg-accent/15 px-2 py-0.5 text-xs font-medium text-accent-foreground border border-accent/30">
+                    Etapa: {STAGE_META[job.stage as JobStageDto]?.label ?? job.stage}
+                  </span>
+                )}
+
+                {job.lastStatus && job.lastStatus !== job.status && (
+                  <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground border border-border">
+                    Previo: {STATUS_META[job.lastStatus as JobStatusDto]?.label ?? job.lastStatus}
+                  </span>
+                )}
+              </div>
             </SheetHeader>
 
             {/* ── Body ── */}
@@ -385,21 +399,36 @@ export function JobDetailSheet({
               <div className="flex flex-col gap-6 p-6">
                 {/* Facts grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  <Fact icon={MapPin} label="Ubicación" value={job.location} />
-                  <Fact icon={Building2} label="Modalidad" value={job.workMode} />
-                  <Fact icon={Wallet} label="Salario" value={job.salary} />
-                  <Fact icon={CalendarDays} label="Fuente" value={job.source} />
+                  <Fact icon={MapPin} label="Ubicación" value={job.location || "—"} />
+                  <Fact icon={Building2} label="Modalidad" value={job.workMode || "—"} />
+                  <Fact icon={Wallet} label="Salario" value={job.salary || "—"} />
+                  <Fact icon={CalendarDays} label="Fuente" value={job.wheresApplied || "—"} />
                   <Fact
                     icon={CalendarDays}
                     label="Postulado"
-                    value={formatDate(job.appliedDate)}
+                    value={formatDate(job.appliedAt || job.createdAt)}
                   />
                   <Fact
                     icon={CalendarDays}
                     label="Actualizado"
-                    value={formatDate(job.lastUpdate)}
+                    value={formatDate(job.updatedAt)}
                   />
                 </div>
+
+                {/* Descripción de la vacante */}
+                {job.description && (
+                  <>
+                    <Separator />
+                    <div className="flex flex-col gap-2">
+                      <span className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                        Descripción de la oferta
+                      </span>
+                      <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                        {job.description}
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {/* Stage progress (sólo en entrevista) */}
                 {job.status === JobStatusDto.INTERVIEW && (
@@ -418,13 +447,19 @@ export function JobDetailSheet({
                   </span>
                   <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">{job.contact}</span>
+                      <span className="text-sm font-medium">{job.contact || "—"}</span>
                       <span className="text-xs text-muted-foreground">
-                        {job.contactEmail}
+                        {job.contactEmail || "—"}
                       </span>
                     </div>
-                    {job.contactEmail !== "—" && (
-                      <Button size="icon-sm" variant="ghost" aria-label="Enviar correo">
+                    {job.contactEmail && job.contactEmail !== "—" && (
+                      <Button
+                        size="icon-sm"
+                        variant="ghost"
+                        aria-label="Enviar correo"
+                        nativeButton={false}
+                        render={<a href={`mailto:${job.contactEmail}`} />}
+                      >
                         <Mail />
                       </Button>
                     )}
@@ -436,8 +471,8 @@ export function JobDetailSheet({
                   <span className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
                     Notas
                   </span>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {job.notes}
+                  <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                    {job.notes || "Sin notas adicionales."}
                   </p>
                 </div>
 
@@ -489,14 +524,16 @@ export function JobDetailSheet({
                 <Pencil data-icon="inline-start" />
                 Editar
               </Button>
-              <Button
-                variant="outline"
-                nativeButton={false}
-                render={<a href={job.url} target="_blank" rel="noreferrer" />}
-              >
-                <ExternalLink data-icon="inline-start" />
-                Oferta
-              </Button>
+              {job.link && (
+                <Button
+                  variant="outline"
+                  nativeButton={false}
+                  render={<a href={job.link} target="_blank" rel="noreferrer" />}
+                >
+                  <ExternalLink data-icon="inline-start" />
+                  Oferta
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"

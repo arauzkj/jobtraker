@@ -63,6 +63,31 @@ export class JobService {
     }
   }
 
+  static async updateJob(id: bigint, jobData: Partial<JobDto>) {
+    try {
+      const jobDto = new JobDto(jobData);
+      const job: Job = await JobRepository.update(id, {
+        title: jobDto.title,
+        description: jobDto.description,
+        status: jobDto.status,
+        role: jobDto.role,
+        location: jobDto.location,
+        workMode: jobDto.workMode,
+        contact: jobDto.contact,
+        notes: jobDto.notes,
+        salary: jobDto.salary,
+        contactEmail: jobDto.contactEmail,
+        link: jobDto.link,
+        company: jobDto.company,
+        wheresApplied: jobDto.wheresApplied,
+      });
+      return JobDto.fromPrisma(job).toJSON();
+    } catch (error) {
+      console.error("Error al actualizar la oferta de trabajo:", error);
+      throw new Error("Ocurrió un error al actualizar la oferta de trabajo");
+    }
+  }
+
   static async updateJobStatus(id: bigint, status: string) {
     try {
       const job = await JobRepository.update(id, { status } as Parameters<

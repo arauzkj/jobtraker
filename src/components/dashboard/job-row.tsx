@@ -15,9 +15,10 @@ export function getInitials(name: string): string {
     .toUpperCase();
 }
 
-export function formatDate(iso: string): string {
-  if (!iso || iso === "—") return "—";
-  const d = new Date(iso + "T00:00:00");
+export function formatDate(val?: string | Date | null): string {
+  if (!val || val === "—") return "—";
+  const d = typeof val === "string" ? new Date(val) : val;
+  if (isNaN(d.getTime())) return "—";
   return d.toLocaleDateString("es-MX", {
     day: "2-digit",
     month: "short",
@@ -43,11 +44,11 @@ export function JobRow({ job, onClick }: JobRowProps) {
       </TableCell>
 
       <TableCell className="hidden text-muted-foreground md:table-cell">
-        {job.location}
+        {job.location || "—"}
       </TableCell>
 
       <TableCell className="hidden lg:table-cell">
-        <span className="text-muted-foreground">{job.workMode}</span>
+        <span className="text-muted-foreground">{job.workMode || "—"}</span>
       </TableCell>
 
       <TableCell>
@@ -57,7 +58,7 @@ export function JobRow({ job, onClick }: JobRowProps) {
       <TableCell className="hidden md:table-cell">
         {job.stage ? (
           <span className="text-sm text-muted-foreground">
-            {STAGE_META[job.stage as JobStageDto].label}
+            {STAGE_META[job.stage as JobStageDto]?.label ?? job.stage}
           </span>
         ) : (
           <span className="text-sm text-muted-foreground/50">—</span>
@@ -65,7 +66,7 @@ export function JobRow({ job, onClick }: JobRowProps) {
       </TableCell>
 
       <TableCell className="hidden pr-4 text-right font-mono text-xs text-muted-foreground sm:table-cell">
-        {formatDate(job.lastUpdate)}
+        {formatDate(job.updatedAt)}
       </TableCell>
     </TableRow>
   );

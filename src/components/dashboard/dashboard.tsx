@@ -153,10 +153,40 @@ export function Dashboard({ userInitials }: DashboardProps) {
     setTimeout(() => setFormOpen(true), 250);
   }
 
-  async function handleUpdate(updated: JobDto): Promise<boolean> {
+  async function handleUpdate(dataForm: FormData): Promise<boolean> {
+    if (!editing || !editing.id) return false;
+    const formEntries = Object.fromEntries(dataForm.entries());
+    const jobData = new JobDto({
+      ...editing,
+      ...formEntries,
+    });
+
     try {
+      const response = await fetch(`/api/jobs/${editing.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(jobData.toJSON()),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Error ${response.status}: no se pudo actualizar la postulación`,
+        );
+      }
+
+      const data = await response.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updated = new JobDto(data.data as any);
+
       setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
       setSelected((prev) => (prev && prev.id === updated.id ? updated : prev));
+
+      toast.add({
+        title: "Postulación actualizada",
+        description: `${updated.role} en ${updated.company}`,
+        type: "success",
+      });
+
       return true;
     } catch (error) {
       toast.add({
