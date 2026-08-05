@@ -65,8 +65,9 @@ export class JobService {
 
   static async updateJob(id: bigint, jobData: Partial<JobDto>) {
     try {
+      const existingJob = await JobRepository.findById(id);
       const jobDto = new JobDto(jobData);
-      const job: Job = await JobRepository.update(id, {
+      const updateData: Parameters<typeof JobRepository.update>[1] = {
         title: jobDto.title,
         description: jobDto.description,
         status: jobDto.status,
@@ -80,7 +81,13 @@ export class JobService {
         link: jobDto.link,
         company: jobDto.company,
         wheresApplied: jobDto.wheresApplied,
-      });
+      };
+
+      if (existingJob && existingJob.status !== jobDto.status) {
+        updateData.lastStatus = existingJob.status;
+      }
+
+      const job: Job = await JobRepository.update(id, updateData);
       return JobDto.fromPrisma(job).toJSON();
     } catch (error) {
       console.error("Error al actualizar la oferta de trabajo:", error);
@@ -90,9 +97,16 @@ export class JobService {
 
   static async updateJobStatus(id: bigint, status: string) {
     try {
-      const job = await JobRepository.update(id, { status } as Parameters<
-        typeof JobRepository.update
-      >[1]);
+      const existingJob = await JobRepository.findById(id);
+      const updateData: Parameters<typeof JobRepository.update>[1] = {
+        status: status as Job["status"],
+      };
+
+      if (existingJob && existingJob.status !== status) {
+        updateData.lastStatus = existingJob.status;
+      }
+
+      const job = await JobRepository.update(id, updateData);
       return JobDto.fromPrisma(job).toJSON();
     } catch (error) {
       console.error("Error al actualizar el estado del trabajo:", error);
