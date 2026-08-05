@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <img src="public/logo.png" alt="JobTracker logo" width="120" />
+</p>
 
-## Getting Started
+<h1 align="center">JobTracker</h1>
 
-First, run the development server:
+Proyecto personal para organizar y dar seguimiento a solicitudes de empleo: estados, etapas del proceso, notas y línea de tiempo por vacante, todo desde un panel centralizado.
+
+## Tecnologías
+
+| Área | Stack |
+|------|-------|
+| Frontend | Next.js (App Router), React, TypeScript |
+| Estilos | Tailwind CSS, shadcn/ui |
+| Backend | API Routes de Next.js |
+| Base de datos | CockroachDB + Prisma ORM |
+| Autenticación | Better Auth |
+| IA (opcional) | OpenRouter — extracción de datos desde enlaces de vacantes |
+| Visual | React Three Fiber |
+
+## Requisitos
+
+- Node.js
+- pnpm
+- Base de datos compatible con PostgreSQL (CockroachDB en este proyecto)
+
+## Configuración
+
+1. Instala dependencias:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Crea un archivo `.env` en la raíz con al menos:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+DATABASE_URL="postgresql://..."
+BETTER_AUTH_URL="http://localhost:3000"
+BETTER_AUTH_SECRET="tu-secreto"
+OPENROUTER_API_KEY="..."   # opcional, para importar vacantes por URL
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Genera el cliente de Prisma y aplica el esquema:
 
-## Learn More
+```bash
+pnpm exec prisma generate
+pnpm exec prisma migrate dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Inicia el servidor de desarrollo:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Abre [http://localhost:3000](http://localhost:3000).
 
-## Deploy on Vercel
+## Comandos del proyecto
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm dev          # desarrollo (genera Prisma Client y levanta Next.js)
+pnpm build        # build de producción
+pnpm start        # servidor de producción
+pnpm lint         # ESLint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Comandos útiles de Prisma
+
+```bash
+pnpm exec prisma generate          # regenerar el cliente tras cambios en el schema
+pnpm exec prisma migrate dev       # crear y aplicar migraciones en desarrollo
+pnpm exec prisma migrate deploy    # aplicar migraciones en producción
+pnpm exec prisma migrate status    # ver estado de migraciones
+pnpm exec prisma db push           # sincronizar schema sin crear migración
+pnpm exec prisma studio            # explorar y editar datos en el navegador
+pnpm exec prisma validate          # validar el schema
+pnpm exec prisma format            # formatear archivos .prisma
+```
+
+## Estructura (resumen)
+
+```
+src/app/          → páginas y rutas API
+src/components/   → UI y dashboard
+src/services/     → lógica de negocio
+src/repositories/ → acceso a datos
+prisma/           → modelos y migraciones
+```
+
+---
+
+Proyecto de uso personal. No está pensado como producto comercial ni como plantilla de producción lista para desplegar.
