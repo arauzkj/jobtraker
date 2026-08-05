@@ -6,9 +6,10 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones — Trayecto",
+  title: "Términos y Condiciones",
   description:
     "Términos y Condiciones de uso de Trayecto, conforme a la legislación de Costa Rica.",
+  alternates: { canonical: "/terminos" },
 };
 
 export default function TerminosPage() {

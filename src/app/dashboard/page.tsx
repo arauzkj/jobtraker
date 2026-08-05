@@ -1,8 +1,14 @@
 import { SceneBackground } from "@/components/background";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { auth } from "@/lib/auth";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Panel",
+  robots: { index: false, follow: false },
+};
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({

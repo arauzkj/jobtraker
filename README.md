@@ -38,6 +38,7 @@ pnpm install
 DATABASE_URL="postgresql://..."
 BETTER_AUTH_URL="http://localhost:3000"
 BETTER_AUTH_SECRET="tu-secreto"
+NEXT_PUBLIC_APP_URL="https://tu-dominio.com" # URL pública usada para SEO y enlaces compartidos
 OPENROUTER_API_KEY="..."   # opcional, para importar vacantes por URL
 ```
 

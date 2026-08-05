@@ -3,9 +3,10 @@ import { EULA_METADATA, EULA_SECTIONS } from "@/content/legal/eula";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "EULA — Trayecto",
+  title: "EULA",
   description:
     "Acuerdo de Licencia de Usuario Final de Trayecto, conforme a la legislación de Costa Rica.",
+  alternates: { canonical: "/eula" },
 };
 
 export default function EulaPage() {
