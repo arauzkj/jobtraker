@@ -1,17 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-type LegalSection = {
-  title: string;
-  body: string;
-};
-
-type LegalDocumentLayoutProps = {
-  title: string;
-  lastUpdated: string;
-  jurisdiction: string;
-  sections: readonly LegalSection[];
-};
 
 function renderInline(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
