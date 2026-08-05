@@ -99,3 +99,15 @@ interface JobDetailSheetProps{
 interface DashboardProps {
   userInitials: string;
 }
+
+type LegalSection = {
+  title: string;
+  body: string;
+};
+
+type LegalDocumentLayoutProps = {
+  title: string;
+  lastUpdated: string;
+  jurisdiction: string;
+  sections: readonly LegalSection[];
+};
