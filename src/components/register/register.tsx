@@ -7,6 +7,7 @@ import {
   User,
   X,
 } from "lucide-react";
+import { LegalAcceptanceLinks } from "@/components/legal/auth-legal-footer";
 import { AuthBrandPanel } from "./auth-brand-panel";
 import { AuthCard } from "./auth-card";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
@@ -164,12 +165,12 @@ export function Register({
             <label className="flex items-start gap-2 text-sm text-muted-foreground">
               <input
                 type="checkbox"
+                name="acceptTerms"
                 className="mt-0.5 size-4 rounded border-input accent-accent"
-                defaultChecked
                 required
               />
               <span>
-                Acepto los términos de servicio y la política de privacidad.
+                He leído y acepto los <LegalAcceptanceLinks />.
               </span>
             </label>
 
