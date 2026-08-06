@@ -278,7 +278,7 @@ function TimelineList({ entries }: { entries: Timeline_EntryDto[] }) {
             <div className={cn("pb-4", isLast && "pb-0")}>
               <p className="text-sm font-medium">{entry.label}</p>
               <p className="font-mono text-[11px] tracking-wide text-muted-foreground">
-                {formatDate(entry.date?.toISOString() || "")}
+                {formatDate(entry.date)}
               </p>
               {entry.notes && (
                 <p className="mt-0.5 text-xs text-muted-foreground">
