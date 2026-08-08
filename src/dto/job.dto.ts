@@ -23,7 +23,6 @@ export class JobDto {
   notes: string;
   salary: string;
   contactEmail: string;
-  appliedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
   link: string;
@@ -46,7 +45,6 @@ export class JobDto {
     this.notes = data.notes || "";
     this.salary = data.salary || "";
     this.contactEmail = data.contactEmail || "";
-    this.appliedAt = data.appliedAt;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
     this.link = data.link || "";
@@ -71,7 +69,6 @@ export class JobDto {
       notes: this.notes,
       salary: this.salary,
       contactEmail: this.contactEmail,
-      appliedAt: this.appliedAt?.toISOString(),
       createdAt: this.createdAt?.toISOString(),
       updatedAt: this.updatedAt?.toISOString(),
       link: this.link,
@@ -99,7 +96,6 @@ export class JobDto {
       notes: this.notes,
       salary: this.salary,
       contactEmail: this.contactEmail,
-      appliedAt: this.appliedAt ?? null,
       link: this.link,
       company: this.company,
       wheresApplied: this.wheresApplied,
@@ -122,7 +118,6 @@ export class JobDto {
       notes: job.notes ?? "",
       salary: job.salary ?? "",
       contactEmail: job.contactEmail ?? "",
-      appliedAt: job.appliedAt,
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
       link: job.link,

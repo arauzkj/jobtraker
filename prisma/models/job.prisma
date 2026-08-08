@@ -12,7 +12,6 @@ model Job {
     notes         String?
     salary        String?
     contactEmail  String?
-    appliedAt     DateTime?
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     link          String
