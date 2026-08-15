@@ -153,7 +153,7 @@ function AddTimelineForm({
   const [stage, setStage] = useState("")
   const [notes, setNotes] = useState("")
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault()
     if (!stage) return
     onSave(stage as JobStageDto, notes.trim())
@@ -252,7 +252,7 @@ function TimelineList({ entries }: { entries: Timeline_EntryDto[] }) {
     <ol className="flex flex-col gap-0">
       {entries.map((entry, i) => {
         const isLast = i === entries.length - 1
-        const step = stepForEntry(entry as Timeline_EntryDto & { stage?: string })
+        const step = stepForEntry(entry as Timeline_EntryDto)
         const hasStep = step !== null
 
         return (
