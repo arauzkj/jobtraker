@@ -1,8 +1,7 @@
-import { JobStageDto } from "@/dto/jobstage.dto.enum";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { TableCell, TableRow } from "../ui/table";
 import { StatusBadge } from "./status-badge";
-import { STAGE_META } from "@/dto/stage_meta.const";
+import { STAGE_META } from "@/lib/validation/job.schema";
 
 
 
@@ -58,7 +57,7 @@ export function JobRow({ job, onClick }: JobRowProps) {
       <TableCell className="hidden md:table-cell">
         {job.stage ? (
           <span className="text-sm text-muted-foreground">
-            {STAGE_META[job.stage as JobStageDto]?.label ?? job.stage}
+            {STAGE_META[job.stage].label}
           </span>
         ) : (
           <span className="text-sm text-muted-foreground/50">—</span>

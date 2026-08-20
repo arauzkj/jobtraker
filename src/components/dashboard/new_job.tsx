@@ -18,12 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
-import { STATUS_META } from "@/dto/status.const";
-import { JobDto } from "@/dto/job.dto";
+import {
+  type CreateJobInput,
+  type JobStatus,
+  STATUS_META,
+} from "@/lib/validation/job.schema";
 import { useEffect, useState } from "react";
 
-const EMPTY_JOB: Partial<JobDto> = {
+const EMPTY_JOB: Partial<CreateJobInput> = {
   title: "",
   role: "",
   company: "",
@@ -31,7 +33,7 @@ const EMPTY_JOB: Partial<JobDto> = {
   workMode: "",
   salary: "",
   wheresApplied: "",
-  status: "APPLIED" as JobStatusDto,
+  status: "APPLIED" as JobStatus,
   contact: "",
   contactEmail: "",
   link: "",
@@ -49,7 +51,7 @@ export function NewJobSheet({
   job = null,
 }: NewJobProps) {
   const isEditing = Boolean(job);
-  const [form, setForm] = useState<Partial<JobDto>>(EMPTY_JOB);
+  const [form, setForm] = useState<Partial<CreateJobInput>>(EMPTY_JOB);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export function NewJobSheet({
         workMode: job.workMode || "",
         salary: job.salary || "",
         wheresApplied: job.wheresApplied || "",
-        status: job.status || ("APPLIED" as JobStatusDto),
+        status: job.status || ("APPLIED" as JobStatus),
         contact: job.contact || "",
         contactEmail: job.contactEmail || "",
         link: job.link || "",
@@ -76,9 +78,9 @@ export function NewJobSheet({
     }
   }, [job, open]);
 
-  function updateField<K extends keyof Partial<JobDto>>(
+  function updateField<K extends keyof CreateJobInput>(
     key: K,
-    value: Partial<JobDto>[K],
+    value: CreateJobInput[K],
   ) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
@@ -227,14 +229,14 @@ export function NewJobSheet({
                   name="status"
                   value={form.status}
                   onValueChange={(value) =>
-                    updateField("status", value as JobStatusDto)
+                    updateField("status", value as JobStatus)
                   }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecciona un estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(Object.keys(STATUS_META) as JobStatusDto[]).map((s) => (
+                    {(Object.keys(STATUS_META) as JobStatus[]).map((s) => (
                       <SelectItem key={s} value={s}>
                         {STATUS_META[s].label}
                       </SelectItem>

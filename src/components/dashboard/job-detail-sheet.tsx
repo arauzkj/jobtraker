@@ -24,13 +24,15 @@ import { ScrollArea } from "../ui/scroll-area"
 import { formatDate } from "./job-row"
 import { Separator } from "../ui/separator"
 import { Button } from "../ui/button"
-import { JobDto } from "@/dto/job.dto"
-import { STAGE_ORDER } from "@/dto/stage_order.const"
-import { STAGE_META } from "@/dto/stage_meta.const"
-import { Timeline_EntryDto } from "@/dto/timeline_entry.dto"
-import { JobStatusDto } from "@/dto/jobstatus.dto.enum"
-import { JobStageDto } from "@/dto/jobstage.dto.enum"
-import { STATUS_META } from "@/dto/status.const"
+import {
+  type Job,
+  type JobStatus,
+  type JobStage,
+  type TimelineEntry,
+  STAGE_ORDER,
+  STAGE_META,
+  STATUS_META,
+} from "@/lib/validation/job.schema"
 import {
   Select,
   SelectContent,
@@ -43,17 +45,17 @@ import { useState } from "react"
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 /** Devuelve la meta del stage si el label coincide con uno conocido, o null */
-function stageFromLabel(label: string): JobStageDto | null {
-  const entry = (Object.entries(STAGE_META) as [JobStageDto, { label: string; step: number }][]).find(
+function stageFromLabel(label: string): JobStage | null {
+  const entry = (Object.entries(STAGE_META) as [JobStage, { label: string; step: number }][]).find(
     ([, meta]) => meta.label === label,
   )
   return entry ? entry[0] : null
 }
 
 /** Devuelve el step de una entrada de timeline (buscando por label o stage guardado) */
-function stepForEntry(entry: Timeline_EntryDto & { stage?: string }): number | null {
+function stepForEntry(entry: TimelineEntry): number | null {
   if (entry.stage && entry.stage in STAGE_META) {
-    return STAGE_META[entry.stage as JobStageDto].step
+    return STAGE_META[entry.stage as JobStage].step
   }
   const fromLabel = stageFromLabel(entry.label)
   return fromLabel !== null ? STAGE_META[fromLabel].step : null
@@ -61,7 +63,7 @@ function stepForEntry(entry: Timeline_EntryDto & { stage?: string }): number | n
 
 // ─── StageProgress ────────────────────────────────────────────────────────────
 
-function StageProgress({ job }: { job: JobDto }) {
+function StageProgress({ job }: { job: Job }) {
   const currentStep = job.stage ? STAGE_META[job.stage].step : 0
   return (
     <div className="flex flex-col gap-3">
@@ -146,7 +148,7 @@ function AddTimelineForm({
   onCancel,
   loading,
 }: {
-  onSave: (stage: JobStageDto, notes: string) => void
+  onSave: (stage: JobStage, notes: string) => void
   onCancel: () => void
   loading: boolean
 }) {
@@ -156,7 +158,7 @@ function AddTimelineForm({
   function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault()
     if (!stage) return
-    onSave(stage as JobStageDto, notes.trim())
+    onSave(stage as JobStage, notes.trim())
   }
 
   return (
@@ -174,7 +176,7 @@ function AddTimelineForm({
         </label>
         <Select
           value={stage}
-          onValueChange={(v) => setStage(v as JobStageDto)}
+          onValueChange={(v) => setStage(v as JobStage)}
           required
         >
           <SelectTrigger id="timeline-stage-select" className="w-full">
@@ -241,7 +243,7 @@ function AddTimelineForm({
 
 // ─── TimelineList ─────────────────────────────────────────────────────────────
 
-function TimelineList({ entries }: { entries: Timeline_EntryDto[] }) {
+function TimelineList({ entries }: { entries: TimelineEntry[] }) {
   if (entries.length === 0) {
     return (
       <p className="text-xs text-muted-foreground">Sin entradas en el historial.</p>
@@ -252,7 +254,7 @@ function TimelineList({ entries }: { entries: Timeline_EntryDto[] }) {
     <ol className="flex flex-col gap-0">
       {entries.map((entry, i) => {
         const isLast = i === entries.length - 1
-        const step = stepForEntry(entry as Timeline_EntryDto)
+        const step = stepForEntry(entry)
         const hasStep = step !== null
 
         return (
@@ -308,17 +310,17 @@ export function JobDetailSheet({
   const [showTimelineForm, setShowTimelineForm] = useState(false)
   const [timelineLoading, setTimelineLoading] = useState(false)
 
-  async function handleStatusChange(newStatus: string) {
-    if (!job || !onStatusChange) return
+  async function handleStatusChange(newStatus: JobStatus | null) {
+    if (!job || !onStatusChange || !newStatus) return
     setStatusLoading(true)
     try {
-      await onStatusChange(job, newStatus as JobStatusDto)
+      await onStatusChange(job, newStatus)
     } finally {
       setStatusLoading(false)
     }
   }
 
-  async function handleSaveTimeline(stage: JobStageDto, notes: string) {
+  async function handleSaveTimeline(stage: JobStage, notes: string) {
     if (!job?.id || !onAddTimeline) return
     setTimelineLoading(true)
     try {
@@ -372,7 +374,7 @@ export function JobDetailSheet({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {(Object.keys(STATUS_META) as JobStatusDto[]).map((s) => (
+                    {(Object.keys(STATUS_META) as JobStatus[]).map((s) => (
                       <SelectItem key={s} value={s}>
                         {STATUS_META[s].label}
                       </SelectItem>
@@ -382,13 +384,13 @@ export function JobDetailSheet({
 
                 {job.stage && (
                   <span className="inline-flex items-center rounded-md bg-accent/15 px-2 py-0.5 text-xs font-medium text-accent-foreground border border-accent/30">
-                    Etapa: {STAGE_META[job.stage as JobStageDto]?.label ?? job.stage}
+                    Etapa: {STAGE_META[job.stage].label}
                   </span>
                 )}
 
                 {job.lastStatus && job.lastStatus !== job.status && (
                   <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground border border-border">
-                    Previo: {STATUS_META[job.lastStatus as JobStatusDto]?.label ?? job.lastStatus}
+                    Previo: {STATUS_META[job.lastStatus].label}
                   </span>
                 )}
               </div>
@@ -406,7 +408,7 @@ export function JobDetailSheet({
                   <Fact
                     icon={CalendarDays}
                     label="Postulado"
-                    value={formatDate(job.appliedAt || job.createdAt)}
+                    value={formatDate(job.createdAt)}
                   />
                   <Fact
                     icon={CalendarDays}
@@ -431,7 +433,7 @@ export function JobDetailSheet({
                 )}
 
                 {/* Stage progress (sólo en entrevista) */}
-                {job.status === JobStatusDto.INTERVIEW && (
+                {job.status === "INTERVIEW" && (
                   <>
                     <Separator />
                     <StageProgress job={job} />

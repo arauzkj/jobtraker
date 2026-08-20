@@ -1,12 +1,11 @@
 import { cn } from "@/lib/utils"
-import { JobStatusDto } from "@/dto/jobstatus.dto.enum"
-import { STATUS_META } from "@/dto/status.const"
+import { type JobStatus, STATUS_META } from "@/lib/validation/job.schema"
 
 export function StatusBadge({
   status,
   className,
 }: {
-  status: JobStatusDto
+  status: JobStatus
   className?: string
 }) {
   const meta = STATUS_META[status]

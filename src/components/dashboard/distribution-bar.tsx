@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
-import { STATUS_META } from "@/dto/status.const";
+import { type JobStatus, STATUS_META } from "@/lib/validation/job.schema";
 import { cn } from "@/lib/utils";
 
 export function DistributionBar({ counts, total }: DistributionBarProps) {
@@ -12,7 +11,7 @@ export function DistributionBar({ counts, total }: DistributionBarProps) {
 
       {/* Barra */}
       <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted">
-        {(Object.keys(STATUS_META) as JobStatusDto[]).map((s) => {
+        {(Object.keys(STATUS_META) as JobStatus[]).map((s) => {
           const pct = ((counts[s] ?? 0) / total) * 100;
           if (!pct) return null;
           return (
@@ -28,7 +27,7 @@ export function DistributionBar({ counts, total }: DistributionBarProps) {
 
       {/* Leyenda */}
       <div className="flex flex-wrap gap-x-4 gap-y-1.5">
-        {(Object.keys(STATUS_META) as JobStatusDto[]).map((s) => (
+        {(Object.keys(STATUS_META) as JobStatus[]).map((s) => (
           <span
             key={s}
             className="flex items-center gap-1.5 text-xs text-muted-foreground"

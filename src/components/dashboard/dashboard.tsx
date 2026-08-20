@@ -18,55 +18,59 @@ import { StatCards } from "./stat-cards";
 import { FilterBar } from "./filter-bar";
 import { JobTable } from "./job-table";
 import { JobDetailSheet } from "./job-detail-sheet";
-import { JobDto } from "@/dto/job.dto";
-import { STATUS_META } from "@/dto/status.const";
 import { NewJobSheet } from "./new_job";
 import { authClient } from "@/lib/auth-client";
-import { JobStatusDto } from "@/dto/jobstatus.dto.enum";
-import { Timeline_EntryDto } from "@/dto/timeline_entry.dto";
 import { toast } from "../ui/toast";
+import {
+  type Job,
+  type JobStatus,
+  type TimelineEntry,
+  JobSchema,
+  STATUS_META,
+} from "@/lib/validation/job.schema";
+
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
-  { key: JobStatusDto.APPLIED, label: "Postulados", icon: Send },
-  { key: JobStatusDto.PENDENTING, label: "Pendientes", icon: CalendarClock },
-  { key: JobStatusDto.INTERVIEW, label: "En entrevista", icon: Users },
-  { key: JobStatusDto.TECHNICAL_TEST, label: "Prueba técnica", icon: FlaskConical },
-  { key: JobStatusDto.UNANSWERED, label: "Sin respuesta", icon: CircleSlash },
-  { key: JobStatusDto.OFFER, label: "Ofertas", icon: Trophy },
-  { key: JobStatusDto.ACCEPTED, label: "Aceptados", icon: BadgeCheck },
-  { key: JobStatusDto.REJECTED, label: "Rechazados", icon: XCircle },
-  { key: JobStatusDto.WITHDRAWN, label: "Retirados", icon: CircleSlash },
+  { key: "APPLIED" as const, label: "Postulados", icon: Send },
+  { key: "PENDENTING" as const, label: "Pendientes", icon: CalendarClock },
+  { key: "INTERVIEW" as const, label: "En entrevista", icon: Users },
+  { key: "TECHNICAL_TEST" as const, label: "Prueba técnica", icon: FlaskConical },
+  { key: "UNANSWERED" as const, label: "Sin respuesta", icon: CircleSlash },
+  { key: "OFFER" as const, label: "Ofertas", icon: Trophy },
+  { key: "ACCEPTED" as const, label: "Aceptados", icon: BadgeCheck },
+  { key: "REJECTED" as const, label: "Rechazados", icon: XCircle },
+  { key: "WITHDRAWN" as const, label: "Retirados", icon: CircleSlash },
 ] as const;
 
 export const FILTERS = [
   { value: "all" as const, label: "Todos" },
-  { value: JobStatusDto.APPLIED, label: "Postulado" },
-  { value: JobStatusDto.PENDENTING, label: "Pendiente" },
-  { value: JobStatusDto.INTERVIEW, label: "En entrevista" },
-  { value: JobStatusDto.TECHNICAL_TEST, label: "Prueba técnica" },
-  { value: JobStatusDto.UNANSWERED, label: "Sin respuesta" },
-  { value: JobStatusDto.OFFER, label: "Oferta" },
-  { value: JobStatusDto.ACCEPTED, label: "Aceptado" },
-  { value: JobStatusDto.REJECTED, label: "Rechazado" },
-  { value: JobStatusDto.WITHDRAWN, label: "Retirado" },
+  { value: "APPLIED" as const, label: "Postulado" },
+  { value: "PENDENTING" as const, label: "Pendiente" },
+  { value: "INTERVIEW" as const, label: "En entrevista" },
+  { value: "TECHNICAL_TEST" as const, label: "Prueba técnica" },
+  { value: "UNANSWERED" as const, label: "Sin respuesta" },
+  { value: "OFFER" as const, label: "Oferta" },
+  { value: "ACCEPTED" as const, label: "Aceptado" },
+  { value: "REJECTED" as const, label: "Rechazado" },
+  { value: "WITHDRAWN" as const, label: "Retirado" },
 ] as const;
 
 export type FilterValue = (typeof FILTERS)[number]["value"];
 
 export function Dashboard({ userInitials }: DashboardProps) {
   const router = useRouter();
-  const [jobs, setJobs] = useState<JobDto[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [filter, setFilter] = useState<FilterValue>("all");
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<JobDto | null>(null);
+  const [selected, setSelected] = useState<Job | null>(null);
   const [open, setOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<JobDto | null>(null);
+  const [editing, setEditing] = useState<Job | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -84,9 +88,10 @@ export function Dashboard({ userInitials }: DashboardProps) {
           );
         }
         const data = await response.json();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const jobsDto: JobDto[] = data.data.map((j: any) => new JobDto(j));
-        setJobs(jobsDto);
+        const parsedJobs: Job[] = data.data.map((j: unknown) =>
+          JobSchema.parse(j),
+        );
+        setJobs(parsedJobs);
       } catch (error) {
         if (error instanceof Error && error.name !== "AbortError") {
           setError(error.message);
@@ -127,7 +132,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
   }, [jobs, filter, query]);
 
   // Handlers
-  const handleSelectJob = (job: JobDto) => {
+  const handleSelectJob = (job: Job) => {
     setSelected(job);
     setOpen(true);
   };
@@ -147,7 +152,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
     setFormOpen(true);
   }
 
-  function handleEdit(job: JobDto) {
+  function handleEdit(job: Job) {
     setOpen(false);
     setEditing(job);
     setTimeout(() => setFormOpen(true), 250);
@@ -156,16 +161,13 @@ export function Dashboard({ userInitials }: DashboardProps) {
   async function handleUpdate(dataForm: FormData): Promise<boolean> {
     if (!editing || !editing.id) return false;
     const formEntries = Object.fromEntries(dataForm.entries());
-    const jobData = new JobDto({
-      ...editing,
-      ...formEntries,
-    });
+    const jobData = { ...editing, ...formEntries };
 
     try {
       const response = await fetch(`/api/jobs/${editing.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(jobData.toJSON()),
+        body: JSON.stringify(jobData),
       });
 
       if (!response.ok) {
@@ -175,8 +177,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
       }
 
       const data = await response.json();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updated = new JobDto(data.data as any);
+      const updated = JobSchema.parse(data.data);
 
       setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
       setSelected((prev) => (prev && prev.id === updated.id ? updated : prev));
@@ -201,7 +202,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
     }
   }
 
-  async function handleDelete(job: JobDto) {
+  async function handleDelete(job: Job) {
     await fetch(`/api/jobs/${job.id}`, {
       method: "DELETE",
     });
@@ -209,7 +210,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
     setOpen(false);
   }
 
-  async function handleStatusChange(job: JobDto, status: JobStatusDto) {
+  async function handleStatusChange(job: Job, status: JobStatus) {
     const response = await fetch(`/api/jobs/${job.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -217,53 +218,42 @@ export function Dashboard({ userInitials }: DashboardProps) {
     });
     if (!response.ok) return;
     const data = await response.json();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updated = new JobDto(data.data as any);
+    const updated = JobSchema.parse(data.data);
     setJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
     setSelected(updated);
   }
 
   async function handleAddTimeline(
-    jobId: bigint,
+    jobId: string,
     entry: { label: string; notes: string; stage?: string },
   ) {
     const response = await fetch("/api/timeline_entry", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jobId: jobId.toString(), ...entry }),
+      body: JSON.stringify({ jobId, ...entry }),
     });
     if (!response.ok) return;
     const data = await response.json();
     // Append the new entry to the selected job's timeline (keep stage for display)
-    const newEntry = Object.assign(new Timeline_EntryDto(data.data), {
-      stage: entry.stage,
-    });
+    const newEntry: TimelineEntry = { ...data.data, stage: entry.stage };
     setJobs((prev) =>
       prev.map((j) => {
         if (j.id !== jobId) return j;
-        return new JobDto({
-          ...j,
-          timeline: [...(j.timeline ?? []), newEntry],
-        });
+        return { ...j, timeline: [...(j.timeline ?? []), newEntry] };
       }),
     );
     setSelected((prev) => {
       if (!prev || prev.id !== jobId) return prev;
-      return new JobDto({
-        ...prev,
-        timeline: [...(prev.timeline ?? []), newEntry],
-      });
+      return { ...prev, timeline: [...(prev.timeline ?? []), newEntry] };
     });
   }
 
   async function handleCreate(dataForm: FormData): Promise<boolean> {
-    const newJob = new JobDto(
-      Object.fromEntries(dataForm.entries()) as Partial<JobDto>,
-    );
+    const formEntries = Object.fromEntries(dataForm.entries());
 
     try {
       const response = await fetch("/api/jobs", {
-        body: JSON.stringify(newJob.toJSON()),
+        body: JSON.stringify(formEntries),
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -277,8 +267,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
       }
 
       const data = await response.json();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const created = new JobDto(data.data as any);
+      const created = JobSchema.parse(data.data);
 
       setJobs((prev) => [created, ...prev]);
 

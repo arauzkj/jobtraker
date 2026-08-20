@@ -29,12 +29,12 @@ interface FilterBarProps {
 }
 
 interface JobTableProps {
-  jobs: Job[];
-  onSelectJob: (job: Job) => void;
+  jobs: import("@/lib/validation/job.schema").Job[];
+  onSelectJob: (job: import("@/lib/validation/job.schema").Job) => void;
 }
 
 interface JobRowProps {
-  job: Job;
+  job: import("@/lib/validation/job.schema").Job;
   onClick: () => void;
 }
 
@@ -83,17 +83,27 @@ interface NewJobProps{
   onOpenChange: (open: boolean) => void
   onCreate?: (data: FormData) => Promise<boolean>;
   onUpdate?: (data: FormData) => Promise<boolean>;
-  job?: JobDto | null
+  job?: import("@/lib/validation/job.schema").Job | null
 }
 
 interface JobDetailSheetProps{
-  job: JobDto | null
+  job: import("@/lib/validation/job.schema").Job | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onEdit?: (job: JobDto) => void
-  onDelete?: (job: JobDto) => void
-  onStatusChange?: (job: JobDto, status: JobStatusDto) => Promise<void>
-  onAddTimeline?: (jobId: bigint, entry: { label: string; notes: string; stage?: string }) => Promise<void>
+  onEdit?: (job: import("@/lib/validation/job.schema").Job) => void
+  onDelete?: (job: import("@/lib/validation/job.schema").Job) => void
+  onStatusChange?: (
+    job: import("@/lib/validation/job.schema").Job,
+    status: import("@/lib/validation/job.schema").JobStatus,
+  ) => Promise<void>
+  onAddTimeline?: (
+    jobId: string,
+    entry: {
+      label: string;
+      notes: string;
+      stage?: import("@/lib/validation/job.schema").JobStage;
+    },
+  ) => Promise<void>
 }
 
 interface DashboardProps {
