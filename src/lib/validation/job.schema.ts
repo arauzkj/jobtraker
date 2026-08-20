@@ -128,10 +128,9 @@ export const TimelineEntrySchema = z.object({
   id: z.string().optional(),
   jobId: z.string(),
   date: z.string().optional(),
-  label: z.string(),
+  stage: JobStageSchema.nullable().optional(),
   notes: z.string(),
-  /** Campo de visualización; no viene de la DB */
-  stage: z.string().optional(),
+  legacyLabel: z.string().nullable().optional(),
 });
 
 export type TimelineEntry = z.infer<typeof TimelineEntrySchema>;

@@ -49,11 +49,12 @@ enum JobStage {
 }
 
 model Timeline_Entry {
-    id    BigInt   @id @default(autoincrement())
-    jobId BigInt
-    job   Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-    date  DateTime @default(now())
-    label String
-    notes String?
+    id          BigInt    @id @default(autoincrement())
+    jobId       BigInt
+    job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    date        DateTime  @default(now())
+    stage       JobStage?
+    legacyLabel String?   @map("label")
+    notes       String?
     @@map("timeline_entry")
 }

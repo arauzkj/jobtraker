@@ -1,17 +1,23 @@
-import { Prisma, Timeline_Entry } from "@/app/generated/prisma/client";
+import {
+  JobStage,
+  Prisma,
+  Timeline_Entry,
+} from "@/app/generated/prisma/client";
 
 export class Timeline_EntryDto {
   id?: bigint;
   jobId: bigint;
   date?: Date;
-  label: string;
+  stage?: JobStage | null;
+  legacyLabel?: string | null;
   notes: string;
 
   constructor(data: Partial<Timeline_EntryDto>) {
     this.id = data.id;
     this.jobId = data.jobId!;
     this.date = this.date = data.date ? new Date(data.date) : undefined;
-    this.label = data.label || "";
+    this.stage = data.stage ?? null;
+    this.legacyLabel = data.legacyLabel ?? null;
     this.notes = data.notes || "";
   }
 
@@ -20,14 +26,20 @@ export class Timeline_EntryDto {
       id: this.id ? this.id.toString() : undefined,
       jobId: this.jobId.toString(),
       date: this.date?.toISOString(),
-      label: this.label,
+      stage: this.stage,
+      legacyLabel: this.legacyLabel,
       notes: this.notes,
     };
   }
 
   toPrismaCreateInput(): Prisma.Timeline_EntryUncheckedCreateInput {
+    if (!this.stage) {
+      throw new Error("stage is required to create a timeline entry");
+    }
+
     return {
-      label: this.label,
+      stage: this.stage,
+      legacyLabel: this.legacyLabel,
       notes: this.notes,
       jobId: this.jobId,
       date: this.date || new Date(),
@@ -39,7 +51,8 @@ export class Timeline_EntryDto {
       id: entry.id,
       jobId: entry.jobId,
       date: entry.date,
-      label: entry.label,
+      stage: entry.stage,
+      legacyLabel: entry.legacyLabel,
       notes: entry.notes ?? "",
     });
   }

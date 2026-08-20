@@ -23,6 +23,7 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "../ui/toast";
 import {
   type Job,
+  type JobStage,
   type JobStatus,
   type TimelineEntry,
   JobSchema,
@@ -225,7 +226,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
 
   async function handleAddTimeline(
     jobId: string,
-    entry: { label: string; notes: string; stage?: string },
+    entry: { stage: JobStage; notes: string },
   ) {
     const response = await fetch("/api/timeline_entry", {
       method: "POST",
@@ -234,8 +235,7 @@ export function Dashboard({ userInitials }: DashboardProps) {
     });
     if (!response.ok) return;
     const data = await response.json();
-    // Append the new entry to the selected job's timeline (keep stage for display)
-    const newEntry: TimelineEntry = { ...data.data, stage: entry.stage };
+    const newEntry: TimelineEntry = data.data;
     setJobs((prev) =>
       prev.map((j) => {
         if (j.id !== jobId) return j;

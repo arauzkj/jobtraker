@@ -35,7 +35,7 @@ export class JobService {
 
   static async AllJobsByApplierId(applierId: bigint) {
     try {
-      const jobs: Job[] = await JobRepository.findAllByApplierId(applierId);
+      const jobs = await JobRepository.findAllByApplierId(applierId);
       if (!jobs || jobs.length === 0) {
         return [];
       }

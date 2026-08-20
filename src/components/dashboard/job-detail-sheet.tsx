@@ -44,21 +44,9 @@ import { useState } from "react"
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
-/** Devuelve la meta del stage si el label coincide con uno conocido, o null */
-function stageFromLabel(label: string): JobStage | null {
-  const entry = (Object.entries(STAGE_META) as [JobStage, { label: string; step: number }][]).find(
-    ([, meta]) => meta.label === label,
-  )
-  return entry ? entry[0] : null
-}
-
-/** Devuelve el step de una entrada de timeline (buscando por label o stage guardado) */
+/** Devuelve el paso de una etapa persistida, o null para datos heredados. */
 function stepForEntry(entry: TimelineEntry): number | null {
-  if (entry.stage && entry.stage in STAGE_META) {
-    return STAGE_META[entry.stage as JobStage].step
-  }
-  const fromLabel = stageFromLabel(entry.label)
-  return fromLabel !== null ? STAGE_META[fromLabel].step : null
+  return entry.stage ? STAGE_META[entry.stage].step : null
 }
 
 // ─── StageProgress ────────────────────────────────────────────────────────────
@@ -278,7 +266,11 @@ function TimelineList({ entries }: { entries: TimelineEntry[] }) {
 
             {/* Contenido */}
             <div className={cn("pb-4", isLast && "pb-0")}>
-              <p className="text-sm font-medium">{entry.label}</p>
+              <p className="text-sm font-medium">
+                {entry.stage
+                  ? STAGE_META[entry.stage].label
+                  : entry.legacyLabel ?? "Etapa sin clasificar"}
+              </p>
               <p className="font-mono text-[11px] tracking-wide text-muted-foreground">
                 {formatDate(entry.date)}
               </p>
@@ -324,8 +316,7 @@ export function JobDetailSheet({
     if (!job?.id || !onAddTimeline) return
     setTimelineLoading(true)
     try {
-      const label = STAGE_META[stage].label
-      await onAddTimeline(job.id, { label, notes, stage })
+      await onAddTimeline(job.id, { stage, notes })
       setShowTimelineForm(false)
     } finally {
       setTimelineLoading(false)

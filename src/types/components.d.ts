@@ -99,9 +99,8 @@ interface JobDetailSheetProps{
   onAddTimeline?: (
     jobId: string,
     entry: {
-      label: string;
       notes: string;
-      stage?: import("@/lib/validation/job.schema").JobStage;
+      stage: import("@/lib/validation/job.schema").JobStage;
     },
   ) => Promise<void>
 }

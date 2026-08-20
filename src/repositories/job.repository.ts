@@ -25,12 +25,12 @@ export class JobRepository {
     }
   }
 
-  static async findAllByApplierId(applierId: bigint): Promise<Job[]> {
+  static async findAllByApplierId(applierId: bigint) {
     try {
-      const jobs: Job[] = await prisma.job.findMany({
+      return await prisma.job.findMany({
         where: { applierId },
+        include: { timeline: true },
       });
-      return jobs;
     } catch (error) {
       console.error(
         "Error al obtener las ofertas de trabajo por aplicante:",
