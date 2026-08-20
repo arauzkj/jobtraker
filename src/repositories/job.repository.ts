@@ -1,5 +1,12 @@
-import { Job, Prisma } from "@/app/generated/prisma/client";
+import { Job, JobStatus, Prisma } from "@/app/generated/prisma/client";
 import prisma from "@/lib/prisma";
+
+type PaginatedJobsOptions = {
+  page: number;
+  pageSize: number;
+  status?: JobStatus;
+  query?: string;
+};
 
 export class JobRepository {
   static async findAll(): Promise<Job[]> {
@@ -39,6 +46,59 @@ export class JobRepository {
       throw new Error(
         "No se pudieron obtener las ofertas de trabajo por aplicante",
       );
+    }
+  }
+
+  static async findPageByApplierId(
+    applierId: bigint,
+    { page, pageSize, status, query }: PaginatedJobsOptions,
+  ) {
+    try {
+      const where: Prisma.JobWhereInput = {
+        applierId,
+        ...(status ? { status } : {}),
+        ...(query
+          ? {
+              OR: [
+                { company: { contains: query, mode: "insensitive" } },
+                { role: { contains: query, mode: "insensitive" } },
+                { location: { contains: query, mode: "insensitive" } },
+              ],
+            }
+          : {}),
+      };
+
+      const [jobs, total, groupedStatusCounts] = await prisma.$transaction([
+        prisma.job.findMany({
+          where,
+          include: { timeline: true },
+          orderBy: { updatedAt: "desc" },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+        }),
+        prisma.job.count({ where }),
+        prisma.job.groupBy({
+          by: ["status"],
+          where: { applierId },
+          orderBy: { status: "asc" },
+          _count: { _all: true },
+        }),
+      ]);
+      const statusCounts = groupedStatusCounts as Array<{
+        status: JobStatus;
+        _count: { _all: number };
+      }>;
+
+      return {
+        jobs,
+        total,
+        counts: Object.fromEntries(
+          statusCounts.map(({ status, _count }) => [status, _count._all]),
+        ),
+      };
+    } catch (error) {
+      console.error("Error al obtener la página de ofertas de trabajo:", error);
+      throw new Error("No se pudieron obtener las ofertas de trabajo");
     }
   }
 

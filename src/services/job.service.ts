@@ -1,4 +1,4 @@
-import { Job } from "@/app/generated/prisma/client";
+import { Job, JobStatus } from "@/app/generated/prisma/client";
 import { JobDto } from "@/dto/job.dto";
 import { JobRepository } from "@/repositories/job.repository";
 
@@ -50,6 +50,23 @@ export class JobService {
         "Ocurrió un error al procesar las ofertas de trabajo por aplicante",
       );
     }
+  }
+
+  static async getJobsPageByApplierId(
+    applierId: bigint,
+    options: {
+      page: number;
+      pageSize: number;
+      status?: JobStatus;
+      query?: string;
+    },
+  ) {
+    const result = await JobRepository.findPageByApplierId(applierId, options);
+
+    return {
+      ...result,
+      jobs: result.jobs.map((job) => JobDto.fromPrisma(job).toJSON()),
+    };
   }
 
   static async createJob(jobData: Partial<JobDto>) {

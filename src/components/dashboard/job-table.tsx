@@ -14,6 +14,7 @@ export function JobTable({ jobs, onSelectJob }: JobTableProps) {
             <TableHead className="hidden lg:table-cell">Modalidad</TableHead>
             <TableHead>Estado</TableHead>
             <TableHead className="hidden md:table-cell">Etapa</TableHead>
+            <TableHead className="hidden xl:table-cell">Creado</TableHead>
             <TableHead className="hidden pr-4 text-right sm:table-cell">
               Actualizado
             </TableHead>

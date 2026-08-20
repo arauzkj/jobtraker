@@ -12,7 +12,7 @@ export function DistributionBar({ counts, total }: DistributionBarProps) {
       {/* Barra */}
       <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted">
         {(Object.keys(STATUS_META) as JobStatus[]).map((s) => {
-          const pct = ((counts[s] ?? 0) / total) * 100;
+          const pct = total ? ((counts[s] ?? 0) / total) * 100 : 0;
           if (!pct) return null;
           return (
             <span

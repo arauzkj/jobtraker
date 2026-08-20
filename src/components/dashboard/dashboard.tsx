@@ -7,12 +7,14 @@ import {
   FlaskConical,
   Send,
   BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
   Trophy,
   Users,
   XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { DistributionBar } from "./distribution-bar";
 import { StatCards } from "./stat-cards";
 import { FilterBar } from "./filter-bar";
@@ -21,13 +23,13 @@ import { JobDetailSheet } from "./job-detail-sheet";
 import { NewJobSheet } from "./new_job";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "../ui/toast";
+import { Button } from "../ui/button";
 import {
   type Job,
   type JobStage,
   type JobStatus,
   type TimelineEntry,
   JobSchema,
-  STATUS_META,
 } from "@/lib/validation/job.schema";
 
 
@@ -59,11 +61,25 @@ export const FILTERS = [
 
 export type FilterValue = (typeof FILTERS)[number]["value"];
 
+type Pagination = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+};
+
 export function Dashboard({ userInitials }: DashboardProps) {
   const router = useRouter();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 1,
+  });
+  const [counts, setCounts] = useState<Record<string, number>>({ all: 0 });
 
   const [filter, setFilter] = useState<FilterValue>("all");
   const [query, setQuery] = useState("");
@@ -79,7 +95,14 @@ export function Dashboard({ userInitials }: DashboardProps) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch("/api/jobs", {
+        const searchParams = new URLSearchParams({
+          page: String(pagination.page),
+          pageSize: String(pagination.pageSize),
+        });
+        if (filter !== "all") searchParams.set("status", filter);
+        if (query.trim()) searchParams.set("q", query.trim());
+
+        const response = await fetch("/api/jobs?" + searchParams.toString(), {
           signal: controller.signal,
         });
 
@@ -93,6 +116,8 @@ export function Dashboard({ userInitials }: DashboardProps) {
           JobSchema.parse(j),
         );
         setJobs(parsedJobs);
+        setCounts(data.counts);
+        setPagination(data.pagination);
       } catch (error) {
         if (error instanceof Error && error.name !== "AbortError") {
           setError(error.message);
@@ -104,33 +129,17 @@ export function Dashboard({ userInitials }: DashboardProps) {
 
     fetchJobs();
     return () => controller.abort(); // Cancelar la solicitud si el componente se desmonta
-  }, []);
+  }, [filter, pagination.page, pagination.pageSize, query]);
 
   const handleFilterChange = (nextFilter: string) => {
     setFilter(nextFilter as FilterValue);
+    setPagination((current) => ({ ...current, page: 1 }));
   };
 
-  // Computed values (memoizados)
-  const counts = useMemo(() => {
-    const c: Record<string, number> = { all: jobs.length };
-    for (const s of Object.keys(STATUS_META)) {
-      c[s] = jobs.filter((j) => j.status === s).length;
-    }
-    return c;
-  }, [jobs]);
-
-  const filtered = useMemo(() => {
-    return jobs.filter((j) => {
-      const matchStatus = filter === "all" || j.status === filter;
-      const q = query.trim().toLowerCase();
-      const matchQuery =
-        !q ||
-        j.company.toLowerCase().includes(q) ||
-        j.role.toLowerCase().includes(q) ||
-        j.location.toLowerCase().includes(q);
-      return matchStatus && matchQuery;
-    });
-  }, [jobs, filter, query]);
+  const handleQueryChange = (nextQuery: string) => {
+    setQuery(nextQuery);
+    setPagination((current) => ({ ...current, page: 1 }));
+  };
 
   // Handlers
   const handleSelectJob = (job: Job) => {
@@ -324,14 +333,14 @@ export function Dashboard({ userInitials }: DashboardProps) {
         />
 
         {/* Distribution Bar */}
-        <DistributionBar counts={counts} total={jobs.length} />
+        <DistributionBar counts={counts} total={counts.all ?? 0} />
 
         {/* Filters */}
         <FilterBar
           filter={filter}
           query={query}
           onFilterChange={handleFilterChange}
-          onQueryChange={setQuery}
+          onQueryChange={handleQueryChange}
         />
 
         {/* Table */}
@@ -340,13 +349,51 @@ export function Dashboard({ userInitials }: DashboardProps) {
             Cargando postulaciones...
           </p>
         ) : (
-          <JobTable jobs={filtered} onSelectJob={handleSelectJob} />
+          <JobTable jobs={jobs} onSelectJob={handleSelectJob} />
         )}
 
         <p className="text-center text-xs text-muted-foreground">
-          Mostrando {filtered.length} de {jobs.length} postulaciones · Haz clic
+          Mostrando {jobs.length} de {pagination.total} postulaciones · Haz clic
           en una fila para ver el detalle
         </p>
+
+        {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((current) => ({
+                  ...current,
+                  page: current.page - 1,
+                }))
+              }
+              disabled={pagination.page === 1 || loading}
+            >
+              <ChevronLeft data-icon="inline-start" />
+              Anterior
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Página {pagination.page} de {pagination.totalPages}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((current) => ({
+                  ...current,
+                  page: current.page + 1,
+                }))
+              }
+              disabled={pagination.page === pagination.totalPages || loading}
+            >
+              Siguiente
+              <ChevronRight data-icon="inline-end" />
+            </Button>
+          </div>
+        )}
       </main>
 
       <JobDetailSheet

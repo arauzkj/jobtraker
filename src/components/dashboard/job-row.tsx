@@ -64,6 +64,10 @@ export function JobRow({ job, onClick }: JobRowProps) {
         )}
       </TableCell>
 
+      <TableCell className="hidden xl:table-cell font-mono text-xs text-muted-foreground">
+        {formatDate(job.createdAt)}
+      </TableCell>
+
       <TableCell className="hidden pr-4 text-right font-mono text-xs text-muted-foreground sm:table-cell">
         {formatDate(job.updatedAt)}
       </TableCell>
