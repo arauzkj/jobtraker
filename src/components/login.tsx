@@ -163,12 +163,12 @@ export function Login() {
                 />
                 Recordarme
               </label>
-              <button
-                type="button"
+              <Link
+                href="/forgot-password"
                 className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 ¿Olvidaste tu contraseña?
-              </button>
+              </Link>
             </div>
 
             <Button
