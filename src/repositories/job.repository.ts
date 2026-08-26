@@ -1,4 +1,9 @@
-import { Job, JobStatus, Prisma } from "@/app/generated/prisma/client";
+import {
+  Job,
+  JobStatus,
+  Prisma,
+  Timeline_Entry,
+} from "@/app/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 type PaginatedJobsOptions = {
@@ -9,9 +14,11 @@ type PaginatedJobsOptions = {
 };
 
 export class JobRepository {
-  static async findAll(): Promise<Job[]> {
+  static async findAll(): Promise<(Job & { timeline: Timeline_Entry[] })[]> {
     try {
-      const jobs: Job[] = await prisma.job.findMany();
+      const jobs = await prisma.job.findMany({
+        include: { timeline: true },
+      });
       return jobs;
     } catch (error) {
       console.error("Error al obtener las ofertas de trabajo:", error);
@@ -19,9 +26,11 @@ export class JobRepository {
     }
   }
 
-  static async findById(id: bigint): Promise<Job | null> {
+  static async findById(
+    id: bigint,
+  ): Promise<(Job & { timeline: Timeline_Entry[] }) | null> {
     try {
-      const job: Job | null = await prisma.job.findUnique({
+      const job = await prisma.job.findUnique({
         where: { id },
         include: { timeline: true },
       });
@@ -32,7 +41,9 @@ export class JobRepository {
     }
   }
 
-  static async findAllByApplierId(applierId: bigint) {
+  static async findAllByApplierId(
+    applierId: bigint,
+  ): Promise<(Job & { timeline: Timeline_Entry[] })[]> {
     try {
       return await prisma.job.findMany({
         where: { applierId },
@@ -102,10 +113,25 @@ export class JobRepository {
     }
   }
 
-  static async create(jobData: Prisma.JobUncheckedCreateInput): Promise<Job> {
+  static async create(
+    jobData: Prisma.JobUncheckedCreateInput,
+  ): Promise<Job & { timeline: Timeline_Entry[] }> {
     try {
-      const job: Job = await prisma.job.create({
-        data: jobData,
+      const job = await prisma.job.create({
+        data: {
+          ...jobData,
+          timeline: jobData.timeline ?? {
+            create: [
+              {
+                stage: jobData.stage ?? "APPLIED",
+                notes: "Postulación creada",
+              },
+            ],
+          },
+        },
+        include: {
+          timeline: true,
+        },
       });
       return job;
     } catch (error) {
@@ -114,13 +140,12 @@ export class JobRepository {
     }
   }
 
-
   static async update(
     id: bigint,
     data: Prisma.JobUncheckedUpdateInput,
-  ): Promise<Job> {
+  ): Promise<Job & { timeline: Timeline_Entry[] }> {
     try {
-      const job: Job = await prisma.job.update({
+      const job = await prisma.job.update({
         where: { id },
         data,
         include: { timeline: true },

@@ -15,7 +15,7 @@ export class Timeline_EntryDto {
   constructor(data: Partial<Timeline_EntryDto>) {
     this.id = data.id;
     this.jobId = data.jobId!;
-    this.date = this.date = data.date ? new Date(data.date) : undefined;
+    this.date = data.date ? new Date(data.date) : undefined;
     this.stage = data.stage ?? null;
     this.legacyLabel = data.legacyLabel ?? null;
     this.notes = data.notes || "";
