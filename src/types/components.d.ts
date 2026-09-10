@@ -6,7 +6,7 @@ type SceneBackgroundProps = {
 
 interface DashboardHeaderProps {
   userInitials: string;
-  onOpenChange: (open: boolean) => void
+  onOpenChange: (open: boolean) => void;
   onLogout: () => void;
 }
 
@@ -21,11 +21,21 @@ interface DistributionBarProps {
   total: number;
 }
 
+type DatePreset = "all" | "today" | "7d" | "30d" | "month" | "custom";
+
+interface DateFilterState {
+  preset: DatePreset;
+  startDate?: string;
+  endDate?: string;
+}
+
 interface FilterBarProps {
-  filter: FilterValue;
+  filter: import("@/components/dashboard/dashboard").FilterValue;
   query: string;
-  onFilterChange: (filter: FilterValue) => void;
+  dateFilter: DateFilterState;
+  onFilterChange: (filter: import("@/components/dashboard/dashboard").FilterValue) => void;
   onQueryChange: (query: string) => void;
+  onDateFilterChange: (dateFilter: DateFilterState) => void;
 }
 
 interface JobTableProps {
@@ -36,6 +46,16 @@ interface JobTableProps {
 interface JobRowProps {
   job: import("@/lib/validation/job.schema").Job;
   onClick: () => void;
+}
+
+interface PaginationControlsProps {
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize?: number;
+  loading?: boolean;
+  maxVisible?: number;
+  onPageChange: (page: number) => void;
 }
 
 interface AuthBrandPanelProps {
@@ -65,8 +85,7 @@ interface PasswordFieldProps {
   setShowPassword?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
-interface RegisterProps{
+interface RegisterProps {
   showPassword: boolean;
   setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
   username: string;
@@ -78,31 +97,31 @@ interface RegisterProps{
   shake: boolean;
 }
 
-interface NewJobProps{
-  open: boolean
-  onOpenChange: (open: boolean) => void
+interface NewJobProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onCreate?: (data: FormData) => Promise<boolean>;
   onUpdate?: (data: FormData) => Promise<boolean>;
-  job?: import("@/lib/validation/job.schema").Job | null
+  job?: import("@/lib/validation/job.schema").Job | null;
 }
 
-interface JobDetailSheetProps{
-  job: import("@/lib/validation/job.schema").Job | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onEdit?: (job: import("@/lib/validation/job.schema").Job) => void
-  onDelete?: (job: import("@/lib/validation/job.schema").Job) => void
+interface JobDetailSheetProps {
+  job: import("@/lib/validation/job.schema").Job | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onEdit?: (job: import("@/lib/validation/job.schema").Job) => void;
+  onDelete?: (job: import("@/lib/validation/job.schema").Job) => void;
   onStatusChange?: (
     job: import("@/lib/validation/job.schema").Job,
     status: import("@/lib/validation/job.schema").JobStatus,
-  ) => Promise<void>
+  ) => Promise<void>;
   onAddTimeline?: (
     jobId: string,
     entry: {
       notes: string;
       stage: import("@/lib/validation/job.schema").JobStage;
     },
-  ) => Promise<void>
+  ) => Promise<void>;
 }
 
 interface DashboardProps {

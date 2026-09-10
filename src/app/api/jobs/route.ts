@@ -40,6 +40,9 @@ export async function GET(request: Request) {
       return Response.json({ error: "Invalid status" }, { status: 400 });
     }
 
+    const startDate = searchParams.get("startDate")?.trim() || undefined;
+    const endDate = searchParams.get("endDate")?.trim() || undefined;
+
     const result = await JobService.getJobsPageByApplierId(
       BigInt(session.user.id),
       {
@@ -47,6 +50,8 @@ export async function GET(request: Request) {
         pageSize,
         status: statusResult?.data,
         query: searchParams.get("q")?.trim() || undefined,
+        startDate,
+        endDate,
       },
     );
 

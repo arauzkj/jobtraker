@@ -59,6 +59,8 @@ export class JobService {
       pageSize: number;
       status?: JobStatus;
       query?: string;
+      startDate?: string;
+      endDate?: string;
     },
   ) {
     const result = await JobRepository.findPageByApplierId(applierId, options);

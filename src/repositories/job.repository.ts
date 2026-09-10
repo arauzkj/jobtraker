@@ -11,6 +11,8 @@ type PaginatedJobsOptions = {
   pageSize: number;
   status?: JobStatus;
   query?: string;
+  startDate?: string;
+  endDate?: string;
 };
 
 export class JobRepository {
@@ -62,12 +64,31 @@ export class JobRepository {
 
   static async findPageByApplierId(
     applierId: bigint,
-    { page, pageSize, status, query }: PaginatedJobsOptions,
+    { page, pageSize, status, query, startDate, endDate }: PaginatedJobsOptions,
   ) {
     try {
+      const createdAtFilter: Prisma.DateTimeFilter = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        if (!isNaN(start.getTime())) {
+          start.setHours(0, 0, 0, 0);
+          createdAtFilter.gte = start;
+        }
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        if (!isNaN(end.getTime())) {
+          end.setHours(23, 59, 59, 999);
+          createdAtFilter.lte = end;
+        }
+      }
+
+      const hasDateFilter = Object.keys(createdAtFilter).length > 0;
+
       const where: Prisma.JobWhereInput = {
         applierId,
         ...(status ? { status } : {}),
+        ...(hasDateFilter ? { createdAt: createdAtFilter } : {}),
         ...(query
           ? {
               OR: [

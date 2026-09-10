@@ -14,3 +14,5 @@ export function useDebounce<T>(value: T, delay = 500): T {
 
     return debouncedValue;
 }
+
+export { useDebounce as useDebounces };

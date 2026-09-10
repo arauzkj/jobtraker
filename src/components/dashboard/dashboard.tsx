@@ -1,4 +1,5 @@
 "use client";
+
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import {
   Briefcase,
@@ -7,8 +8,6 @@ import {
   FlaskConical,
   Send,
   BadgeCheck,
-  ChevronLeft,
-  ChevronRight,
   Trophy,
   Users,
   XCircle,
@@ -21,9 +20,10 @@ import { FilterBar } from "./filter-bar";
 import { JobTable } from "./job-table";
 import { JobDetailSheet } from "./job-detail-sheet";
 import { NewJobSheet } from "./new_job";
+import { PaginationControls } from "./pagination-controls";
+import { useDebounce } from "@/hooks/use-debounce";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "../ui/toast";
-import { Button } from "../ui/button";
 import {
   type Job,
   type JobStage,
@@ -31,7 +31,6 @@ import {
   type TimelineEntry,
   JobSchema,
 } from "@/lib/validation/job.schema";
-
 
 export const STAT_CARDS = [
   { key: "all" as const, label: "Total", icon: Briefcase },
@@ -83,6 +82,11 @@ export function Dashboard({ userInitials }: DashboardProps) {
 
   const [filter, setFilter] = useState<FilterValue>("all");
   const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 400);
+  const [dateFilter, setDateFilter] = useState<DateFilterState>({
+    preset: "all",
+  });
+
   const [selected, setSelected] = useState<Job | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -100,7 +104,13 @@ export function Dashboard({ userInitials }: DashboardProps) {
           pageSize: String(pagination.pageSize),
         });
         if (filter !== "all") searchParams.set("status", filter);
-        if (query.trim()) searchParams.set("q", query.trim());
+        if (debouncedQuery.trim()) searchParams.set("q", debouncedQuery.trim());
+        if (dateFilter.startDate) {
+          searchParams.set("startDate", dateFilter.startDate);
+        }
+        if (dateFilter.endDate) {
+          searchParams.set("endDate", dateFilter.endDate);
+        }
 
         const response = await fetch("/api/jobs?" + searchParams.toString(), {
           signal: controller.signal,
@@ -129,7 +139,14 @@ export function Dashboard({ userInitials }: DashboardProps) {
 
     fetchJobs();
     return () => controller.abort(); // Cancelar la solicitud si el componente se desmonta
-  }, [filter, pagination.page, pagination.pageSize, query]);
+  }, [
+    filter,
+    pagination.page,
+    pagination.pageSize,
+    debouncedQuery,
+    dateFilter.startDate,
+    dateFilter.endDate,
+  ]);
 
   const handleFilterChange = (nextFilter: string) => {
     setFilter(nextFilter as FilterValue);
@@ -139,6 +156,15 @@ export function Dashboard({ userInitials }: DashboardProps) {
   const handleQueryChange = (nextQuery: string) => {
     setQuery(nextQuery);
     setPagination((current) => ({ ...current, page: 1 }));
+  };
+
+  const handleDateFilterChange = (nextDateFilter: DateFilterState) => {
+    setDateFilter(nextDateFilter);
+    setPagination((current) => ({ ...current, page: 1 }));
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    setPagination((current) => ({ ...current, page: nextPage }));
   };
 
   // Handlers
@@ -339,8 +365,10 @@ export function Dashboard({ userInitials }: DashboardProps) {
         <FilterBar
           filter={filter}
           query={query}
+          dateFilter={dateFilter}
           onFilterChange={handleFilterChange}
           onQueryChange={handleQueryChange}
+          onDateFilterChange={handleDateFilterChange}
         />
 
         {/* Table */}
@@ -358,40 +386,18 @@ export function Dashboard({ userInitials }: DashboardProps) {
         </p>
 
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-center gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setPagination((current) => ({
-                  ...current,
-                  page: current.page - 1,
-                }))
-              }
-              disabled={pagination.page === 1 || loading}
-            >
-              <ChevronLeft data-icon="inline-start" />
-              Anterior
-            </Button>
-            <span className="text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center gap-2 pt-2">
+            <PaginationControls
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              total={pagination.total}
+              loading={loading}
+              maxVisible={5}
+              onPageChange={handlePageChange}
+            />
+            <span className="text-xs text-muted-foreground">
               Página {pagination.page} de {pagination.totalPages}
             </span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setPagination((current) => ({
-                  ...current,
-                  page: current.page + 1,
-                }))
-              }
-              disabled={pagination.page === pagination.totalPages || loading}
-            >
-              Siguiente
-              <ChevronRight data-icon="inline-end" />
-            </Button>
           </div>
         )}
       </main>
