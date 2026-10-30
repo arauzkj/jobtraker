@@ -1,4 +1,4 @@
-import { Briefcase, Building2, Pencil, Save } from "lucide-react";
+import { Briefcase, Building2, Pencil, Save, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { ScrollArea } from "../ui/scroll-area";
@@ -10,6 +10,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "../ui/sheet";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "../ui/input-group";
 import { Input } from "../ui/input";
 import {
   Select,
@@ -18,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Spinner } from "../ui/spinner";
 import {
   type CreateJobInput,
   type JobStatus,
@@ -53,6 +60,7 @@ export function NewJobSheet({
   const isEditing = Boolean(job);
   const [form, setForm] = useState<Partial<CreateJobInput>>(EMPTY_JOB);
   const [saving, setSaving] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -83,6 +91,36 @@ export function NewJobSheet({
     value: CreateJobInput[K],
   ) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleFetchFromLink() {
+    const url = form.link?.trim();
+    if (!url) return;
+
+    setFetching(true);
+    try {
+      const res = await fetch(
+        `/api/jobs/link/${encodeURIComponent(url)}`,
+      );
+      const json = await res.json();
+
+      if (!res.ok) return;
+
+      const d = json.data as Partial<CreateJobInput>;
+      setForm((prev) => ({
+        ...prev,
+        ...(d.title && { title: d.title }),
+        ...(d.role && { role: d.role }),
+        ...(d.company && { company: d.company }),
+        ...(d.location && { location: d.location }),
+        ...(d.workMode && WORK_MODES.includes(d.workMode) && { workMode: d.workMode }),
+        ...(d.salary && { salary: d.salary }),
+        ...(d.wheresApplied && { wheresApplied: d.wheresApplied }),
+        ...(d.description && { description: d.description }),
+      }));
+    } finally {
+      setFetching(false);
+    }
   }
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -131,6 +169,34 @@ export function NewJobSheet({
         <form id="new-job-form" onSubmit={handleSubmit} className="contents">
           <ScrollArea className="flex-1 min-h-0">
             <FieldGroup className="p-6">
+              <Field>
+                <FieldLabel htmlFor="link">Enlace de la oferta</FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    id="link"
+                    name="link"
+                    placeholder="https://..."
+                    value={form.link}
+                    onChange={(e) => updateField("link", e.target.value)}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      size="xs"
+                      variant="ghost"
+                      disabled={!form.link?.trim() || fetching}
+                      onClick={handleFetchFromLink}
+                    >
+                      {fetching ? (
+                        <Spinner className="size-3.5" />
+                      ) : (
+                        <Search className="size-3.5" />
+                      )}
+                      {fetching ? "Buscando..." : "Buscar"}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+              </Field>
+
               <Field>
                 <FieldLabel htmlFor="title">Título</FieldLabel>
                 <Input
@@ -272,17 +338,6 @@ export function NewJobSheet({
                   />
                 </Field>
               </div>
-
-              <Field>
-                <FieldLabel htmlFor="link">Enlace de la oferta</FieldLabel>
-                <Input
-                  id="link"
-                  name="link"
-                  placeholder="https://..."
-                  value={form.link}
-                  onChange={(e) => updateField("link", e.target.value)}
-                />
-              </Field>
 
               <Field>
                 <FieldLabel htmlFor="description">Descripción</FieldLabel>
